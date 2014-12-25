@@ -1,0 +1,784 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>django_event.publisher.models &mdash; django_event 0.3.2 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="django_event 0.3.2 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../../../index.html" class="fa fa-home"> django_event</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../django_event.html">django_event</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../django_event.management.html">django_event.management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../django_event.publisher.html">django_event.publisher</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../django_event.rabbitmq.html">django_event.rabbitmq</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../django_event.subscriber.html">django_event.subscriber</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../django_event.html#module-django_event.utils">django_event.utils</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">django_event</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>django_event.publisher.models</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <h1>Source code for django_event.publisher.models</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Core event model module.</span>
+
+<span class="sd">You must handle old events by yourself using cron or celery worker.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">timedelta</span>
+
+<span class="kn">import</span> <span class="nn">celery</span>
+<span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span> <span class="nn">django.utils</span> <span class="kn">import</span> <span class="n">timezone</span>
+
+<span class="kn">from</span> <span class="nn">.publisher</span> <span class="kn">import</span> <span class="n">BlockingPublisher</span>
+<span class="kn">from</span> <span class="nn">.request</span> <span class="kn">import</span> <span class="n">EventRequest</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">get_routing</span>
+
+
+<div class="viewcode-block" id="EventQuerySet"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.models.EventQuerySet">[docs]</a><span class="k">class</span> <span class="nc">EventQuerySet</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">QuerySet</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Event query set and manager.</span>
+<span class="sd">    Defines some useful shortcuts.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="EventQuerySet.not_viewed"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.models.EventQuerySet.not_viewed">[docs]</a>    <span class="k">def</span> <span class="nf">not_viewed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Not viewed events.</span>
+
+<span class="sd">        :return: Not viewed events.</span>
+<span class="sd">        :rtype: :class:`EventQuerySet`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">viewed</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="EventQuerySet.viewed"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.models.EventQuerySet.viewed">[docs]</a>    <span class="k">def</span> <span class="nf">viewed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Viewed events.</span>
+
+<span class="sd">        :return: Viewed events.</span>
+<span class="sd">        :rtype: :class:`EventQuerySet`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">viewed</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="EventQuerySet.old"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.models.EventQuerySet.old">[docs]</a>    <span class="k">def</span> <span class="nf">old</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Old events.</span>
+
+<span class="sd">        :return: Old events.</span>
+<span class="sd">        :rtype: :class:`EventQuerySet`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">storing_days</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="s">&#39;EVENT_STORE_DAYS&#39;</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">completed_at__lte</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">storing_days</span><span class="p">)</span>
+        <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="EventQuerySet.completed"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.models.EventQuerySet.completed">[docs]</a>    <span class="k">def</span> <span class="nf">completed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Completed events.</span>
+
+<span class="sd">        :return: Completed events.</span>
+<span class="sd">        :rtype: :class:`EventQuerySet`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">completed</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="EventQuerySet.not_completed"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.models.EventQuerySet.not_completed">[docs]</a>    <span class="k">def</span> <span class="nf">not_completed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Not completed events.</span>
+
+<span class="sd">        :return: Not completed events.</span>
+<span class="sd">        :rtype: :class:`EventQuerySet`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">completed</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="EventQuerySet.successful"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.models.EventQuerySet.successful">[docs]</a>    <span class="k">def</span> <span class="nf">successful</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Successful events.</span>
+
+<span class="sd">        :return: Successful events.</span>
+<span class="sd">        :rtype: :class:`EventQuerySet`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">completed</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="EventQuerySet.failed"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.models.EventQuerySet.failed">[docs]</a>    <span class="k">def</span> <span class="nf">failed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Failed events.</span>
+
+<span class="sd">        :return: Failed events.</span>
+<span class="sd">        :rtype: :class:`EventQuerySet`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">completed</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="EventQuerySet.mark_viewed"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.models.EventQuerySet.mark_viewed">[docs]</a>    <span class="k">def</span> <span class="nf">mark_viewed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Mark completed events as viewed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">completed</span><span class="p">()</span><span class="o">.</span><span class="n">not_viewed</span><span class="p">()</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">viewed</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="Event"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.models.Event">[docs]</a><span class="k">class</span> <span class="nc">Event</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Core event class.</span>
+<span class="sd">    Don&#39;t inherit this model.</span>
+<span class="sd">    Majority of model methods have custom_message parameter in case if you</span>
+<span class="sd">    don&#39;t like/need default message protocol.</span>
+<span class="sd">    Most of the methods are for private need i.e. all on_* methods. Be sure</span>
+<span class="sd">    to not use these methods directly.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">verbose_name</span> <span class="o">=</span> <span class="s">&#39;Event&#39;</span>
+        <span class="n">verbose_name_plural</span> <span class="o">=</span> <span class="s">&#39;Events&#39;</span>
+
+    <span class="n">objects</span> <span class="o">=</span> <span class="n">EventQuerySet</span><span class="o">.</span><span class="n">as_manager</span><span class="p">()</span>
+
+    <span class="n">user</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="s">&#39;AUTH_USER_MODEL&#39;</span><span class="p">,</span> <span class="n">User</span><span class="p">))</span>
+    <span class="nb">type</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+    <span class="n">send_mail</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+    <span class="n">task_id</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">task_name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">editable</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">event_request</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="n">created_at</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now_add</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">started_at</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">completed_at</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="n">started</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">completed</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">canceled</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">retried</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">viewed</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+    <span class="n">status</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init model method. You don&#39;t basically need to call this method</span>
+<span class="sd">        manually. Instead use .create() method.</span>
+
+<span class="sd">        :param args: Model args.</span>
+<span class="sd">        :param kwargs: Model kwargs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">Event</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_publisher</span> <span class="o">=</span> <span class="n">BlockingPublisher</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_retried_id</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_progress_throttling</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_routing_strategy</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_routing_key</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Event.create"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.models.Event.create">[docs]</a>    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span>
+               <span class="n">progress_throttling</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+               <span class="n">routing_strategy</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+               <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fabric method for event creature. Use this as main event creature</span>
+<span class="sd">        source.</span>
+
+<span class="sd">        :param progress_throttling: Describes how often event will send</span>
+<span class="sd">         progress messages when user increments progress via</span>
+<span class="sd">         :func:`increment_progress` method. :class:`Event` will not send</span>
+<span class="sd">         any progress messages with out user actions on</span>
+<span class="sd">         :func:`increment_progress`. If you don&#39;t need progress you may not</span>
+<span class="sd">         specify this parameter and not use :func:`increment_progress` method.</span>
+<span class="sd">        :type progress_throttling: :class:`float`</span>
+
+<span class="sd">        :param routing_strategy: Routing strategy e.g. what listeners will do</span>
+<span class="sd">         with messages. Empty strategy means you want to deliver notification to</span>
+<span class="sd">         all subscribed clients.</span>
+<span class="sd">        :type routing_strategy: :class:`str`</span>
+
+<span class="sd">        :param args: Model init args</span>
+
+<span class="sd">        :param kwargs: Model init kwargs</span>
+
+<span class="sd">        :return: Created and configured event.</span>
+<span class="sd">        :rtype: :class:`Event`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">event</span> <span class="o">=</span> <span class="n">cls</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">event</span><span class="o">.</span><span class="n">_progress_throttling</span> <span class="o">=</span> <span class="n">progress_throttling</span>
+        <span class="n">event</span><span class="o">.</span><span class="n">_routing_strategy</span> <span class="o">=</span> <span class="n">routing_strategy</span>
+        <span class="n">event</span><span class="o">.</span><span class="n">_routing_key</span> <span class="o">=</span> <span class="n">get_routing</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">routing_strategy</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">event</span>
+
+    <span class="c">############################################################################</span>
+    <span class="c"># SHORTCUTS</span>
+    <span class="c">############################################################################</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="Event.failure"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.models.Event.failure">[docs]</a>    <span class="k">def</span> <span class="nf">failure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shortcut for event status.</span>
+
+<span class="sd">        :return: True if event failed else False.</span>
+<span class="sd">        :rtype: :class:`bool`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">True</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="k">else</span> <span class="bp">False</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="Event.success"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.models.Event.success">[docs]</a>    <span class="k">def</span> <span class="nf">success</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shortcut for event status.</span>
+
+<span class="sd">        :return: True if event succeed else False.</span>
+<span class="sd">        :rtype: :class:`bool`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">failure</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="Event.may_be_retried"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.models.Event.may_be_retried">[docs]</a>    <span class="k">def</span> <span class="nf">may_be_retried</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shortcut for event state.</span>
+
+<span class="sd">        :return: Check if event may be retried.</span>
+<span class="sd">        :rtype: :class:`bool`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">canceled</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">failure</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">retried</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="Event.may_be_canceled"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.models.Event.may_be_canceled">[docs]</a>    <span class="k">def</span> <span class="nf">may_be_canceled</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shortcut for event state.</span>
+
+<span class="sd">        :return: Check if event may be canceled.</span>
+<span class="sd">        :rtype: :class:`bool`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">started</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">completed</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">canceled</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">retried</span>
+        <span class="p">)</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Event.delete_old"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.models.Event.delete_old">[docs]</a>    <span class="k">def</span> <span class="nf">delete_old</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Deletes old events.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">cls</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">viewed</span><span class="p">()</span><span class="o">.</span><span class="n">old</span><span class="p">()</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="Event.view"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.models.Event.view">[docs]</a>    <span class="k">def</span> <span class="nf">view</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Mark instance as viewed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">viewed</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+    <span class="c">############################################################################</span>
+    <span class="c"># EXECUTING METHODS</span>
+    <span class="c">############################################################################</span>
+</div>
+<div class="viewcode-block" id="Event.start"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.models.Event.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+              <span class="n">custom_message</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+              <span class="n">callback</span><span class="o">=</span><span class="k">lambda</span> <span class="n">event</span><span class="p">:</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Start event and save state into database. It will always call passed</span>
+<span class="sd">        callback.</span>
+
+<span class="sd">        :param custom_message: Overrides default message.</span>
+<span class="sd">        :type custom_message: JSON serializable object.</span>
+
+<span class="sd">        :param callback: Callback after event started</span>
+<span class="sd">        :type callback: callable object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">started</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">started_at</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_publisher</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_start</span><span class="p">(</span><span class="n">custom_message</span><span class="p">)</span>
+        <span class="n">callback</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Event.complete"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.models.Event.complete">[docs]</a>    <span class="k">def</span> <span class="nf">complete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">result</span><span class="p">,</span>
+                 <span class="n">status</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                 <span class="n">custom_message</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">callback</span><span class="o">=</span><span class="k">lambda</span> <span class="n">event</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                 <span class="n">errback</span><span class="o">=</span><span class="k">lambda</span> <span class="n">event</span><span class="p">:</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Complete event and save state into database. It will always call passed</span>
+<span class="sd">        callback.</span>
+
+<span class="sd">        :param result: Task result.</span>
+<span class="sd">        :type result: JSON serializable object.</span>
+
+<span class="sd">        :param status: Describes task result status e.g. task raised exception</span>
+<span class="sd">         will set False status.</span>
+
+<span class="sd">        :type status: :class:`bool`</span>
+
+<span class="sd">        :param custom_message: Custom message.</span>
+<span class="sd">        :type custom_message: JSON serializable object.</span>
+
+<span class="sd">        :param callback: Callback after event ended with success.</span>
+<span class="sd">        :type callback: callable object</span>
+
+<span class="sd">        :param errback: Callback after event ended with error.</span>
+<span class="sd">        :type errback: callable object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">completed</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">status</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="n">result</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">completed_at</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_complete</span><span class="p">(</span><span class="n">custom_message</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">errback</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_publisher</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="Event.increment_progress"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.models.Event.increment_progress">[docs]</a>    <span class="k">def</span> <span class="nf">increment_progress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">progress_delta</span><span class="p">,</span> <span class="n">custom_message</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Increments event progress with out saving to database.</span>
+<span class="sd">        If custom message passed it will send it instead of default message.</span>
+
+<span class="sd">        :param progress_delta: Progress delta.</span>
+<span class="sd">        :type progress_delta: :class:`float`</span>
+
+<span class="sd">        :param custom_message: Custom message.</span>
+<span class="sd">        :type custom_message: JSON serializable object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span> <span class="o">+</span> <span class="n">progress_delta</span> <span class="o">&gt;</span> <span class="mf">100.0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span> <span class="o">=</span> <span class="mf">99.9</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span> <span class="o">+=</span> <span class="n">progress_delta</span>
+        <span class="k">if</span> <span class="n">progress_delta</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_progress_throttling</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_progress_change</span><span class="p">(</span><span class="n">custom_message</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Event.retry"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.models.Event.retry">[docs]</a>    <span class="k">def</span> <span class="nf">retry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">custom_message</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retry not completed event.</span>
+<span class="sd">        If custom message passed it will send it instead of default message.</span>
+
+<span class="sd">        :param custom_message: Custom message.</span>
+<span class="sd">        :type custom_message: JSON serializable object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">request</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">retry_request</span> <span class="o">=</span> <span class="n">EventRequest</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_request</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">retry_request</span> <span class="o">=</span> <span class="n">EventRequest</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">new_task_id</span> <span class="o">=</span> <span class="n">celery</span><span class="o">.</span><span class="n">current_app</span><span class="o">.</span><span class="n">send_task</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">task_name</span><span class="p">,</span>
+            <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">retry_request</span><span class="p">,</span> <span class="p">)</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">retried</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viewed</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_retry</span><span class="p">(</span><span class="n">custom_message</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_retried_id</span> <span class="o">=</span> <span class="n">Event</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">task_id</span><span class="o">=</span><span class="n">new_task_id</span><span class="p">)</span><span class="o">.</span><span class="n">id</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_retried_id</span>
+</div>
+<div class="viewcode-block" id="Event.cancel"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.models.Event.cancel">[docs]</a>    <span class="k">def</span> <span class="nf">cancel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">custom_message</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Cancel executing event.</span>
+<span class="sd">        If custom message passed it will send it instead of default message.</span>
+
+<span class="sd">        :param custom_message: Custom message.</span>
+<span class="sd">        :type custom_message: JSON serializable object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">celery</span><span class="o">.</span><span class="n">task</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">revoke</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task_id</span><span class="p">,</span> <span class="n">terminate</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canceled</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viewed</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_cancel</span><span class="p">(</span><span class="n">custom_message</span><span class="p">)</span>
+
+    <span class="c">############################################################################</span>
+    <span class="c"># CALLBACKS</span>
+    <span class="c">############################################################################</span>
+</div>
+<div class="viewcode-block" id="Event.on_start"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.models.Event.on_start">[docs]</a>    <span class="k">def</span> <span class="nf">on_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">custom_message</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Start callback. Sends message to subscribed clients.</span>
+<span class="sd">        If custom message passed it will send it instead of default message.</span>
+
+<span class="sd">        :param custom_message: Custom message.</span>
+<span class="sd">        :type custom_message: JSON serializable object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">custom_message</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_publisher</span><span class="o">.</span><span class="n">publish_message</span><span class="p">(</span>
+                <span class="n">custom_message</span>
+            <span class="p">)</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_publisher</span><span class="o">.</span><span class="n">publish_message</span><span class="p">({</span>
+            <span class="s">&#39;message&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+                    <span class="s">&#39;action&#39;</span><span class="p">:</span> <span class="s">&#39;started&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                    <span class="s">&#39;body&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                    <span class="s">&#39;error&#39;</span><span class="p">:</span> <span class="bp">None</span>
+                <span class="p">}</span>
+            <span class="p">},</span>
+            <span class="s">&#39;routing_strategy&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_routing_strategy</span><span class="p">,</span>
+            <span class="s">&#39;routing_key&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_routing_key</span>
+        <span class="p">},</span> <span class="n">routing_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Event.on_complete"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.models.Event.on_complete">[docs]</a>    <span class="k">def</span> <span class="nf">on_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">custom_message</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">errback</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Complete callback. Dispatch between success and error status.</span>
+
+<span class="sd">        :param custom_message: Custom message.</span>
+<span class="sd">        :type custom_message: JSON serializable object.</span>
+
+<span class="sd">        :param callback: Callback after event ended with success.</span>
+<span class="sd">        :type callback: callable object</span>
+
+<span class="sd">        :param errback: Callback after event ended with error.</span>
+<span class="sd">        :type errback: callable object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_success</span><span class="p">(</span><span class="n">custom_message</span><span class="p">,</span> <span class="n">callback</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_error</span><span class="p">(</span><span class="n">custom_message</span><span class="p">,</span> <span class="n">errback</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Event.on_success"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.models.Event.on_success">[docs]</a>    <span class="k">def</span> <span class="nf">on_success</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">custom_message</span><span class="p">,</span> <span class="n">callback</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Success callback. Sends message to subscribed clients.</span>
+
+<span class="sd">        :param custom_message: Custom message</span>
+<span class="sd">        :type custom_message: JSON serializable object.</span>
+
+<span class="sd">        :param callback: Callback after event ended with success.</span>
+<span class="sd">        :type callback: callable object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">custom_message</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_publisher</span><span class="o">.</span><span class="n">publish_message</span><span class="p">(</span>
+                <span class="n">custom_message</span>
+            <span class="p">)</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_publisher</span><span class="o">.</span><span class="n">publish_message</span><span class="p">({</span>
+            <span class="s">&#39;message&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+                    <span class="s">&#39;action&#39;</span><span class="p">:</span> <span class="s">&#39;completed&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="s">&#39;success&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;body&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">result</span><span class="p">,</span>
+                    <span class="s">&#39;error&#39;</span><span class="p">:</span> <span class="bp">None</span>
+                <span class="p">}</span>
+            <span class="p">},</span>
+            <span class="s">&#39;routing_strategy&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_routing_strategy</span><span class="p">,</span>
+            <span class="s">&#39;routing_key&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_routing_key</span>
+        <span class="p">},</span> <span class="n">routing_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+        <span class="n">callback</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Event.on_error"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.models.Event.on_error">[docs]</a>    <span class="k">def</span> <span class="nf">on_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">custom_message</span><span class="p">,</span> <span class="n">errback</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Error callback. Sends message to subscribed clients.</span>
+
+<span class="sd">        :param custom_message: Custom message</span>
+<span class="sd">        :type custom_message: JSON serializable object.</span>
+
+<span class="sd">        :param errback: Errback after event ended with error.</span>
+<span class="sd">        :type errback: callable object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">custom_message</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_publisher</span><span class="o">.</span><span class="n">publish_message</span><span class="p">(</span>
+                <span class="n">custom_message</span>
+            <span class="p">)</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_publisher</span><span class="o">.</span><span class="n">publish_message</span><span class="p">({</span>
+            <span class="s">&#39;message&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+                    <span class="s">&#39;action&#39;</span><span class="p">:</span> <span class="s">&#39;completed&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="s">&#39;error&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;body&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                    <span class="s">&#39;error&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">result</span>
+                <span class="p">}</span>
+            <span class="p">},</span>
+            <span class="s">&#39;routing_strategy&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_routing_strategy</span><span class="p">,</span>
+            <span class="s">&#39;routing_key&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_routing_key</span>
+        <span class="p">},</span> <span class="n">routing_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+        <span class="n">errback</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Event.on_progress_change"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.models.Event.on_progress_change">[docs]</a>    <span class="k">def</span> <span class="nf">on_progress_change</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">custom_message</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Progress change callback. Sends message to subscribed clients.</span>
+
+<span class="sd">        :param custom_message: Custom message.</span>
+<span class="sd">        :type custom_message: JSON serializable object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">custom_message</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_publisher</span><span class="o">.</span><span class="n">publish_message</span><span class="p">(</span>
+                <span class="n">custom_message</span>
+            <span class="p">)</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_publisher</span><span class="o">.</span><span class="n">publish_message</span><span class="p">({</span>
+            <span class="s">&#39;message&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+                    <span class="s">&#39;action&#39;</span><span class="p">:</span> <span class="s">&#39;progress_change&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span><span class="p">,</span>
+                    <span class="s">&#39;body&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                    <span class="s">&#39;error&#39;</span><span class="p">:</span> <span class="bp">None</span>
+                <span class="p">}</span>
+            <span class="p">},</span>
+            <span class="s">&#39;routing_strategy&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_routing_strategy</span><span class="p">,</span>
+            <span class="s">&#39;routing_key&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_routing_key</span>
+        <span class="p">},</span> <span class="n">routing_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Event.on_cancel"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.models.Event.on_cancel">[docs]</a>    <span class="k">def</span> <span class="nf">on_cancel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">custom_message</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Cancel callback. Sends message to subscribed clients.</span>
+
+<span class="sd">        :param custom_message: Custom message.</span>
+<span class="sd">        :type custom_message: JSON serializable object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">custom_message</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_publisher</span><span class="o">.</span><span class="n">publish_message</span><span class="p">(</span>
+                <span class="n">custom_message</span>
+            <span class="p">)</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_publisher</span><span class="o">.</span><span class="n">publish_message</span><span class="p">({</span>
+            <span class="s">&#39;message&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+                    <span class="s">&#39;action&#39;</span><span class="p">:</span> <span class="s">&#39;canceled&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                    <span class="s">&#39;body&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                    <span class="s">&#39;error&#39;</span><span class="p">:</span> <span class="bp">None</span>
+                <span class="p">}</span>
+            <span class="p">},</span>
+            <span class="s">&#39;routing_strategy&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_routing_strategy</span><span class="p">,</span>
+            <span class="s">&#39;routing_key&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_routing_key</span>
+        <span class="p">},</span> <span class="n">routing_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Event.on_retry"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.models.Event.on_retry">[docs]</a>    <span class="k">def</span> <span class="nf">on_retry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">custom_message</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Cancel callback. Sends message to subscribed clients.</span>
+
+<span class="sd">        :param custom_message: Custom message.</span>
+<span class="sd">        :type custom_message: JSON serializable object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">custom_message</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_publisher</span><span class="o">.</span><span class="n">publish_message</span><span class="p">(</span>
+                <span class="n">custom_message</span>
+            <span class="p">)</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_publisher</span><span class="o">.</span><span class="n">publish_message</span><span class="p">({</span>
+            <span class="s">&#39;message&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+                    <span class="s">&#39;action&#39;</span><span class="p">:</span> <span class="s">&#39;retried&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                    <span class="s">&#39;body&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_retried_id</span><span class="p">,</span>
+                    <span class="s">&#39;error&#39;</span><span class="p">:</span> <span class="bp">None</span>
+                <span class="p">}</span>
+            <span class="p">},</span>
+            <span class="s">&#39;routing_strategy&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_routing_strategy</span><span class="p">,</span>
+            <span class="s">&#39;routing_key&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_routing_key</span>
+        <span class="p">},</span> <span class="n">routing_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+
+    <span class="c">############################################################################</span>
+    <span class="c"># SEND METHODS</span>
+    <span class="c">############################################################################</span>
+</div>
+<div class="viewcode-block" id="Event.send_message"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.models.Event.send_message">[docs]</a>    <span class="k">def</span> <span class="nf">send_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                     <span class="n">message</span><span class="p">,</span>
+                     <span class="n">content_type</span><span class="p">,</span>
+                     <span class="n">broadcast</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                     <span class="n">callback</span><span class="o">=</span><span class="k">lambda</span> <span class="n">event</span><span class="p">:</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Send custom message to subscribed clients and execute passed callback.</span>
+
+<span class="sd">        :param message: Message.</span>
+<span class="sd">        :type message: :class:`str`</span>
+
+<span class="sd">        :param content_type: Message content type.</span>
+<span class="sd">        :type content_type: :class:`str`</span>
+
+<span class="sd">        :param broadcast: True if you need broadcast.</span>
+<span class="sd">        :type broadcast: :class:`bool`</span>
+
+<span class="sd">        :param callback: Callback after message send.</span>
+<span class="sd">        :type callback: callable object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_publisher</span><span class="o">.</span><span class="n">publish_message</span><span class="p">(</span>
+            <span class="n">message</span><span class="p">,</span>
+            <span class="n">content_type</span><span class="o">=</span><span class="n">content_type</span><span class="p">,</span>
+            <span class="n">routing_key</span><span class="o">=</span><span class="s">&#39;&#39;</span> <span class="k">if</span> <span class="n">broadcast</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">callback</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Event.send_email"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.models.Event.send_email">[docs]</a>    <span class="k">def</span> <span class="nf">send_email</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sends email to user after event is done.</span>
+
+<span class="sd">        TODO: implement email sending.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c"># TODO: Implement email sending</span>
+        <span class="k">pass</span></div></div>
+</pre></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014, Dmitry Panchenko.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.3.2',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

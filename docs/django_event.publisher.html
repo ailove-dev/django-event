@@ -1,0 +1,1096 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>django_event.publisher &mdash; django_event 0.3.2 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="django_event 0.3.2 documentation" href="index.html"/>
+        <link rel="up" title="django_event" href="django_event.html"/>
+        <link rel="next" title="django_event.publisher.rest_framework" href="django_event.publisher.rest_framework.html"/>
+        <link rel="prev" title="django_event.management.commands" href="django_event.management.commands.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="fa fa-home"> django_event</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="django_event.html">django_event</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="django_event.management.html">django_event.management</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">django_event.publisher</a></li>
+<li class="toctree-l2"><a class="reference internal" href="django_event.rabbitmq.html">django_event.rabbitmq</a></li>
+<li class="toctree-l2"><a class="reference internal" href="django_event.subscriber.html">django_event.subscriber</a></li>
+<li class="toctree-l2"><a class="reference internal" href="django_event.html#module-django_event.utils">django_event.utils</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">django_event</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="django_event.html">django_event</a> &raquo;</li>
+      
+    <li>django_event.publisher</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/django_event.publisher.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <div class="section" id="django-event-publisher">
+<h1>django_event.publisher<a class="headerlink" href="#django-event-publisher" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="django_event.publisher.rest_framework.html">django_event.publisher.rest_framework</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="django_event.publisher.rest_framework.html#module-django_event.publisher.rest_framework.serializers">django_event.publisher.serializers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="django_event.publisher.rest_framework.html#module-django_event.publisher.rest_framework.urls">django_event.publisher.urls</a></li>
+<li class="toctree-l2"><a class="reference internal" href="django_event.publisher.rest_framework.html#module-django_event.publisher.rest_framework.views">django_event.publisher.views</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="module-django_event.publisher.decorator">
+<span id="django-event-publisher-decorator"></span><h2>django_event.publisher.decorator<a class="headerlink" href="#module-django_event.publisher.decorator" title="Permalink to this headline">¶</a></h2>
+<p>Core publisher client module.
+Basically you should use this decorator instead of manually write events into
+database.
+Decorator specifies some overridable methods if you need basic customization.</p>
+<p>Usage examples:</p>
+<p>Defining event task:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="nd">@event</span><span class="p">(</span><span class="n">event_type</span><span class="o">=</span><span class="s">&#39;some_type&#39;</span><span class="p">,</span> <span class="n">routing_strategy</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">some_task</span><span class="p">(</span><span class="n">event_request</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+    <span class="n">argument</span> <span class="o">=</span> <span class="n">event_request</span><span class="o">.</span><span class="n">custom_argument</span>
+    <span class="k">return</span> <span class="n">some_processed_data</span><span class="p">(</span><span class="n">event_request</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">event</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>And call:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">some_task</span><span class="o">.</span><span class="n">delay</span><span class="p">(</span><span class="n">EventRequest</span><span class="p">(</span><span class="n">django_request</span><span class="p">,</span> <span class="n">custom_argument</span><span class="o">=</span><span class="mi">123</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>You can know more about .delay() or other methods in Celery docs.</p>
+<dl class="class">
+<dt id="django_event.publisher.decorator.event">
+<em class="property">class </em><tt class="descclassname">django_event.publisher.decorator.</tt><tt class="descname">event</tt><big>(</big><em>event_type=''</em>, <em>send_mail=False</em>, <em>progress_throttling=0.1</em>, <em>routing_strategy=''</em>, <em>task_kwargs=None</em>, <em>on_start=lambda _event: None</em>, <em>on_success=lambda _event: None</em>, <em>on_error=lambda _event: None</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/decorator.html#event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.decorator.event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Main client publisher interface.
+Decorates function and return celery task.</p>
+<p>Automatically start and end event after celery started/completed the
+task. You must pass EventRequest into decorated function.
+<tt class="xref py py-class docutils literal"><span class="pre">EventRequest</span></tt> can accept keyword arguments needed by wrapped
+function which are not required but django request are required by internal
+needs. This decorator automatically set <tt class="xref py py-class docutils literal"><span class="pre">EventRequest</span></tt> and
+<tt class="xref py py-class docutils literal"><span class="pre">Event</span></tt> instances as wrapped function arguments.</p>
+<p>Wrapped func may raise specific exception <tt class="xref py py-class docutils literal"><span class="pre">EventError</span></tt> used to notify
+subscribers about failure. Basically this decorator will handle only that
+type of exceptions. Be sure you handle all raised exception in wrapped func
+otherwise it will pass outside decorator and into database as well.</p>
+<dl class="method">
+<dt id="django_event.publisher.decorator.event.__call__">
+<tt class="descname">__call__</tt><big>(</big><em>func</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/decorator.html#event.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.decorator.event.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wraps passed function into Celery <tt class="xref py py-class docutils literal"><span class="pre">Task</span></tt>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>func</strong> (<em>callable object</em>) &#8211; Function to be wrapped.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Celery task instance.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">Celery <tt class="xref py py-class docutils literal"><span class="pre">Task</span></tt></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.publisher.decorator.event.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>event_type=''</em>, <em>send_mail=False</em>, <em>progress_throttling=0.1</em>, <em>routing_strategy=''</em>, <em>task_kwargs=None</em>, <em>on_start=lambda _event: None</em>, <em>on_success=lambda _event: None</em>, <em>on_error=lambda _event: None</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/decorator.html#event.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.decorator.event.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>event_type</strong> (<tt class="xref py py-class docutils literal"><span class="pre">str</span></tt>) &#8211; Event type, using in message routing.</li>
+<li><strong>send_mail</strong> (<tt class="xref py py-class docutils literal"><span class="pre">bool</span></tt>) &#8211; Send email after event is done.</li>
+<li><strong>progress_throttling</strong> (<tt class="xref py py-class docutils literal"><span class="pre">float</span></tt>) &#8211; Describes how often event will send
+progress messages. See <tt class="xref py py-class docutils literal"><span class="pre">Event</span></tt> docs for more information
+about this parameter.</li>
+<li><strong>routing_strategy</strong> (<tt class="xref py py-class docutils literal"><span class="pre">str</span></tt>) &#8211; Routing strategy e.g. what listeners will do
+with messages. Empty strategy means you want to deliver notification to
+all subscribed clients. See <tt class="xref py py-class docutils literal"><span class="pre">Event</span></tt> docs for more information
+about this parameter.</li>
+<li><strong>task_kwargs</strong> (<tt class="xref py py-class docutils literal"><span class="pre">dict</span></tt>) &#8211; Celery task arguments.</li>
+<li><strong>on_start</strong> (<tt class="xref py py-class docutils literal"><span class="pre">str</span></tt>) &#8211; Event start callback.</li>
+<li><strong>on_success</strong> (<em>callable object</em>) &#8211; Event success callback.</li>
+<li><strong>on_error</strong> (<em>callable object</em>) &#8211; Event error callback.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.publisher.decorator.event.complete_event">
+<tt class="descname">complete_event</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/django_event/publisher/decorator.html#event.complete_event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.decorator.event.complete_event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ends event.
+Override this if you want to customize message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.publisher.decorator.event.create_event">
+<tt class="descname">create_event</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/django_event/publisher/decorator.html#event.create_event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.decorator.event.create_event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create event model with passing arguments.
+Basically you dont need to manually create event.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.publisher.decorator.event.start_event">
+<tt class="descname">start_event</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/django_event/publisher/decorator.html#event.start_event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.decorator.event.start_event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts event.
+Override this if you want to customize message.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-django_event.publisher.exceptions">
+<span id="django-event-publisher-exceptions"></span><h2>django_event.publisher.exceptions<a class="headerlink" href="#module-django_event.publisher.exceptions" title="Permalink to this headline">¶</a></h2>
+<p>Exceptions module.</p>
+<dl class="exception">
+<dt id="django_event.publisher.exceptions.EventError">
+<em class="property">exception </em><tt class="descclassname">django_event.publisher.exceptions.</tt><tt class="descname">EventError</tt><a class="reference internal" href="_modules/django_event/publisher/exceptions.html#EventError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.exceptions.EventError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+<p>Using to notify subscribed clients about event failure.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-django_event.publisher.models">
+<span id="django-event-publisher-models"></span><h2>django_event.publisher.models<a class="headerlink" href="#module-django_event.publisher.models" title="Permalink to this headline">¶</a></h2>
+<p>Core event model module.</p>
+<p>You must handle old events by yourself using cron or celery worker.</p>
+<dl class="class">
+<dt id="django_event.publisher.models.EventQuerySet">
+<em class="property">class </em><tt class="descclassname">django_event.publisher.models.</tt><tt class="descname">EventQuerySet</tt><big>(</big><em>model=None</em>, <em>query=None</em>, <em>using=None</em>, <em>hints=None</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/models.html#EventQuerySet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.models.EventQuerySet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.db.models.query.QuerySet</span></tt></p>
+<p>Event query set and manager.
+Defines some useful shortcuts.</p>
+<dl class="method">
+<dt id="django_event.publisher.models.EventQuerySet.completed">
+<tt class="descname">completed</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/django_event/publisher/models.html#EventQuerySet.completed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.models.EventQuerySet.completed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Completed events.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Completed events.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#django_event.publisher.models.EventQuerySet" title="django_event.publisher.models.EventQuerySet"><tt class="xref py py-class docutils literal"><span class="pre">EventQuerySet</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.publisher.models.EventQuerySet.failed">
+<tt class="descname">failed</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/django_event/publisher/models.html#EventQuerySet.failed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.models.EventQuerySet.failed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Failed events.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Failed events.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#django_event.publisher.models.EventQuerySet" title="django_event.publisher.models.EventQuerySet"><tt class="xref py py-class docutils literal"><span class="pre">EventQuerySet</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.publisher.models.EventQuerySet.mark_viewed">
+<tt class="descname">mark_viewed</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/django_event/publisher/models.html#EventQuerySet.mark_viewed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.models.EventQuerySet.mark_viewed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mark completed events as viewed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.publisher.models.EventQuerySet.not_completed">
+<tt class="descname">not_completed</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/django_event/publisher/models.html#EventQuerySet.not_completed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.models.EventQuerySet.not_completed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Not completed events.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Not completed events.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#django_event.publisher.models.EventQuerySet" title="django_event.publisher.models.EventQuerySet"><tt class="xref py py-class docutils literal"><span class="pre">EventQuerySet</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.publisher.models.EventQuerySet.not_viewed">
+<tt class="descname">not_viewed</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/django_event/publisher/models.html#EventQuerySet.not_viewed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.models.EventQuerySet.not_viewed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Not viewed events.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Not viewed events.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#django_event.publisher.models.EventQuerySet" title="django_event.publisher.models.EventQuerySet"><tt class="xref py py-class docutils literal"><span class="pre">EventQuerySet</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.publisher.models.EventQuerySet.old">
+<tt class="descname">old</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/django_event/publisher/models.html#EventQuerySet.old"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.models.EventQuerySet.old" title="Permalink to this definition">¶</a></dt>
+<dd><p>Old events.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Old events.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#django_event.publisher.models.EventQuerySet" title="django_event.publisher.models.EventQuerySet"><tt class="xref py py-class docutils literal"><span class="pre">EventQuerySet</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.publisher.models.EventQuerySet.successful">
+<tt class="descname">successful</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/django_event/publisher/models.html#EventQuerySet.successful"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.models.EventQuerySet.successful" title="Permalink to this definition">¶</a></dt>
+<dd><p>Successful events.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Successful events.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#django_event.publisher.models.EventQuerySet" title="django_event.publisher.models.EventQuerySet"><tt class="xref py py-class docutils literal"><span class="pre">EventQuerySet</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.publisher.models.EventQuerySet.viewed">
+<tt class="descname">viewed</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/django_event/publisher/models.html#EventQuerySet.viewed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.models.EventQuerySet.viewed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Viewed events.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Viewed events.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#django_event.publisher.models.EventQuerySet" title="django_event.publisher.models.EventQuerySet"><tt class="xref py py-class docutils literal"><span class="pre">EventQuerySet</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="django_event.publisher.models.Event">
+<em class="property">class </em><tt class="descclassname">django_event.publisher.models.</tt><tt class="descname">Event</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/models.html#Event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.models.Event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Core event class.
+Don&#8217;t inherit this model.
+Majority of model methods have custom_message parameter in case if you
+don&#8217;t like/need default message protocol.
+Most of the methods are for private need i.e. all on_* methods. Be sure
+to not use these methods directly.</p>
+<dl class="method">
+<dt id="django_event.publisher.models.Event.complete">
+<tt class="descname">complete</tt><big>(</big><em>result</em>, <em>status=True</em>, <em>custom_message=None</em>, <em>callback=lambda event: None</em>, <em>errback=lambda event: None</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/models.html#Event.complete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.models.Event.complete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Complete event and save state into database. It will always call passed
+callback.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>result</strong> (<em>JSON serializable object.</em>) &#8211; Task result.</li>
+<li><strong>status</strong> (<tt class="xref py py-class docutils literal"><span class="pre">bool</span></tt>) &#8211; Describes task result status e.g. task raised exception
+will set False status.</li>
+<li><strong>custom_message</strong> (<em>JSON serializable object.</em>) &#8211; Custom message.</li>
+<li><strong>callback</strong> (<em>callable object</em>) &#8211; Callback after event ended with success.</li>
+<li><strong>errback</strong> (<em>callable object</em>) &#8211; Callback after event ended with error.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.publisher.models.Event.send_message">
+<tt class="descname">send_message</tt><big>(</big><em>message</em>, <em>content_type</em>, <em>broadcast=False</em>, <em>callback=lambda event: None</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/models.html#Event.send_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.models.Event.send_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send custom message to subscribed clients and execute passed callback.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>message</strong> (<tt class="xref py py-class docutils literal"><span class="pre">str</span></tt>) &#8211; Message.</li>
+<li><strong>content_type</strong> (<tt class="xref py py-class docutils literal"><span class="pre">str</span></tt>) &#8211; Message content type.</li>
+<li><strong>broadcast</strong> (<tt class="xref py py-class docutils literal"><span class="pre">bool</span></tt>) &#8211; True if you need broadcast.</li>
+<li><strong>callback</strong> (<em>callable object</em>) &#8211; Callback after message send.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.publisher.models.Event.start">
+<tt class="descname">start</tt><big>(</big><em>custom_message=None</em>, <em>callback=lambda event: None</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/models.html#Event.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.models.Event.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start event and save state into database. It will always call passed
+callback.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>custom_message</strong> (<em>JSON serializable object.</em>) &#8211; Overrides default message.</li>
+<li><strong>callback</strong> (<em>callable object</em>) &#8211; Callback after event started</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.publisher.models.Event.cancel">
+<tt class="descname">cancel</tt><big>(</big><em>custom_message=None</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/models.html#Event.cancel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.models.Event.cancel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cancel executing event.
+If custom message passed it will send it instead of default message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>custom_message</strong> (<em>JSON serializable object.</em>) &#8211; Custom message.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="django_event.publisher.models.Event.create">
+<em class="property">classmethod </em><tt class="descname">create</tt><big>(</big><em>progress_throttling=0.1</em>, <em>routing_strategy=''</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/models.html#Event.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.models.Event.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fabric method for event creature. Use this as main event creature
+source.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>progress_throttling</strong> (<tt class="xref py py-class docutils literal"><span class="pre">float</span></tt>) &#8211; Describes how often event will send
+progress messages when user increments progress via
+<a class="reference internal" href="#django_event.publisher.models.Event.increment_progress" title="django_event.publisher.models.Event.increment_progress"><tt class="xref py py-func docutils literal"><span class="pre">increment_progress()</span></tt></a> method. <a class="reference internal" href="#django_event.publisher.models.Event" title="django_event.publisher.models.Event"><tt class="xref py py-class docutils literal"><span class="pre">Event</span></tt></a> will not send
+any progress messages with out user actions on
+<a class="reference internal" href="#django_event.publisher.models.Event.increment_progress" title="django_event.publisher.models.Event.increment_progress"><tt class="xref py py-func docutils literal"><span class="pre">increment_progress()</span></tt></a>. If you don&#8217;t need progress you may not
+specify this parameter and not use <a class="reference internal" href="#django_event.publisher.models.Event.increment_progress" title="django_event.publisher.models.Event.increment_progress"><tt class="xref py py-func docutils literal"><span class="pre">increment_progress()</span></tt></a> method.</li>
+<li><strong>routing_strategy</strong> (<tt class="xref py py-class docutils literal"><span class="pre">str</span></tt>) &#8211; Routing strategy e.g. what listeners will do
+with messages. Empty strategy means you want to deliver notification to
+all subscribed clients.</li>
+<li><strong>args</strong> &#8211; Model init args</li>
+<li><strong>kwargs</strong> &#8211; Model init kwargs</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Created and configured event.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#django_event.publisher.models.Event" title="django_event.publisher.models.Event"><tt class="xref py py-class docutils literal"><span class="pre">Event</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="django_event.publisher.models.Event.delete_old">
+<em class="property">classmethod </em><tt class="descname">delete_old</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/django_event/publisher/models.html#Event.delete_old"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.models.Event.delete_old" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes old events.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django_event.publisher.models.Event.failure">
+<tt class="descname">failure</tt><a class="reference internal" href="_modules/django_event/publisher/models.html#Event.failure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.models.Event.failure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut for event status.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if event failed else False.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><tt class="xref py py-class docutils literal"><span class="pre">bool</span></tt></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.publisher.models.Event.increment_progress">
+<tt class="descname">increment_progress</tt><big>(</big><em>progress_delta</em>, <em>custom_message=None</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/models.html#Event.increment_progress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.models.Event.increment_progress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Increments event progress with out saving to database.
+If custom message passed it will send it instead of default message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>progress_delta</strong> (<tt class="xref py py-class docutils literal"><span class="pre">float</span></tt>) &#8211; Progress delta.</li>
+<li><strong>custom_message</strong> (<em>JSON serializable object.</em>) &#8211; Custom message.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django_event.publisher.models.Event.may_be_canceled">
+<tt class="descname">may_be_canceled</tt><a class="reference internal" href="_modules/django_event/publisher/models.html#Event.may_be_canceled"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.models.Event.may_be_canceled" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut for event state.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Check if event may be canceled.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><tt class="xref py py-class docutils literal"><span class="pre">bool</span></tt></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django_event.publisher.models.Event.may_be_retried">
+<tt class="descname">may_be_retried</tt><a class="reference internal" href="_modules/django_event/publisher/models.html#Event.may_be_retried"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.models.Event.may_be_retried" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut for event state.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Check if event may be retried.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><tt class="xref py py-class docutils literal"><span class="pre">bool</span></tt></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.publisher.models.Event.on_cancel">
+<tt class="descname">on_cancel</tt><big>(</big><em>custom_message</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/models.html#Event.on_cancel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.models.Event.on_cancel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cancel callback. Sends message to subscribed clients.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>custom_message</strong> (<em>JSON serializable object.</em>) &#8211; Custom message.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.publisher.models.Event.on_complete">
+<tt class="descname">on_complete</tt><big>(</big><em>custom_message</em>, <em>callback</em>, <em>errback</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/models.html#Event.on_complete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.models.Event.on_complete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Complete callback. Dispatch between success and error status.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>custom_message</strong> (<em>JSON serializable object.</em>) &#8211; Custom message.</li>
+<li><strong>callback</strong> (<em>callable object</em>) &#8211; Callback after event ended with success.</li>
+<li><strong>errback</strong> (<em>callable object</em>) &#8211; Callback after event ended with error.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.publisher.models.Event.on_error">
+<tt class="descname">on_error</tt><big>(</big><em>custom_message</em>, <em>errback</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/models.html#Event.on_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.models.Event.on_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Error callback. Sends message to subscribed clients.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>custom_message</strong> (<em>JSON serializable object.</em>) &#8211; Custom message</li>
+<li><strong>errback</strong> (<em>callable object</em>) &#8211; Errback after event ended with error.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.publisher.models.Event.on_progress_change">
+<tt class="descname">on_progress_change</tt><big>(</big><em>custom_message</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/models.html#Event.on_progress_change"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.models.Event.on_progress_change" title="Permalink to this definition">¶</a></dt>
+<dd><p>Progress change callback. Sends message to subscribed clients.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>custom_message</strong> (<em>JSON serializable object.</em>) &#8211; Custom message.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.publisher.models.Event.on_retry">
+<tt class="descname">on_retry</tt><big>(</big><em>custom_message</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/models.html#Event.on_retry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.models.Event.on_retry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cancel callback. Sends message to subscribed clients.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>custom_message</strong> (<em>JSON serializable object.</em>) &#8211; Custom message.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.publisher.models.Event.on_start">
+<tt class="descname">on_start</tt><big>(</big><em>custom_message</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/models.html#Event.on_start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.models.Event.on_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start callback. Sends message to subscribed clients.
+If custom message passed it will send it instead of default message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>custom_message</strong> (<em>JSON serializable object.</em>) &#8211; Custom message.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.publisher.models.Event.on_success">
+<tt class="descname">on_success</tt><big>(</big><em>custom_message</em>, <em>callback</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/models.html#Event.on_success"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.models.Event.on_success" title="Permalink to this definition">¶</a></dt>
+<dd><p>Success callback. Sends message to subscribed clients.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>custom_message</strong> (<em>JSON serializable object.</em>) &#8211; Custom message</li>
+<li><strong>callback</strong> (<em>callable object</em>) &#8211; Callback after event ended with success.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.publisher.models.Event.retry">
+<tt class="descname">retry</tt><big>(</big><em>custom_message=None</em>, <em>request=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/models.html#Event.retry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.models.Event.retry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retry not completed event.
+If custom message passed it will send it instead of default message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>custom_message</strong> (<em>JSON serializable object.</em>) &#8211; Custom message.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.publisher.models.Event.send_email">
+<tt class="descname">send_email</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/django_event/publisher/models.html#Event.send_email"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.models.Event.send_email" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends email to user after event is done.</p>
+<p>TODO: implement email sending.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django_event.publisher.models.Event.success">
+<tt class="descname">success</tt><a class="reference internal" href="_modules/django_event/publisher/models.html#Event.success"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.models.Event.success" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut for event status.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if event succeed else False.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><tt class="xref py py-class docutils literal"><span class="pre">bool</span></tt></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.publisher.models.Event.view">
+<tt class="descname">view</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/django_event/publisher/models.html#Event.view"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.models.Event.view" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mark instance as viewed.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-django_event.publisher.publisher">
+<span id="django-event-publisher-publisher"></span><h2>django_event.publisher.publisher<a class="headerlink" href="#module-django_event.publisher.publisher" title="Permalink to this headline">¶</a></h2>
+<p>RabbitMQ publisher module.
+Contains asynchronous publisher for tornado and also blocking publisher for
+django.</p>
+<dl class="class">
+<dt id="django_event.publisher.publisher.BlockingPublisher">
+<em class="property">class </em><tt class="descclassname">django_event.publisher.publisher.</tt><tt class="descname">BlockingPublisher</tt><big>(</big><em>host=settings.RABBITMQ_HOST</em>, <em>port=settings.RABBITMQ_PORT</em>, <em>virtual_host=settings.RABBITMQ_VIRTUALHOST</em>, <em>username=settings.RABBITMQ_USERNAME</em>, <em>password=settings.RABBITMQ_PASSWORD</em>, <em>exchange_name='direct'</em>, <em>exchange_type='direct'</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/publisher.html#BlockingPublisher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.publisher.BlockingPublisher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#django_event.publisher.publisher.Publisher" title="django_event.publisher.publisher.Publisher"><tt class="xref py py-class docutils literal"><span class="pre">django_event.publisher.publisher.Publisher</span></tt></a></p>
+<p>Synchronous publisher class. Use it with django.</p>
+<dl class="method">
+<dt id="django_event.publisher.publisher.BlockingPublisher.connect">
+<tt class="descname">connect</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/django_event/publisher/publisher.html#BlockingPublisher.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.publisher.BlockingPublisher.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Synchronous connection. Connects to RabbitMQ server and establish
+blocking connection. After connection is established call on_connected
+callback which will try to reconnect if this function failed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.publisher.publisher.BlockingPublisher.on_channel_open">
+<tt class="descname">on_channel_open</tt><big>(</big><em>channel</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/publisher.html#BlockingPublisher.on_channel_open"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.publisher.BlockingPublisher.on_channel_open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback on channel open. It will declare exchanges for messaging. See
+RabbitMQ docs for more information.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>channel</strong> &#8211; Opened channel.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><tt class="xref py py-class docutils literal"><span class="pre">BlockingChannel</span></tt></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.publisher.publisher.BlockingPublisher.on_connected">
+<tt class="descname">on_connected</tt><big>(</big><em>connection</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/publisher.html#BlockingPublisher.on_connected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.publisher.BlockingPublisher.on_connected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback on connection. Reconnect if connection dropped. Otherwise it
+will open channel and call on_channel_open callback.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>connection</strong> (<tt class="xref py py-class docutils literal"><span class="pre">BlockingConnection</span></tt>) &#8211; RabbitMQ connection.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="django_event.publisher.publisher.Publisher">
+<em class="property">class </em><tt class="descclassname">django_event.publisher.publisher.</tt><tt class="descname">Publisher</tt><big>(</big><em>host=settings.RABBITMQ_HOST</em>, <em>port=settings.RABBITMQ_PORT</em>, <em>virtual_host=settings.RABBITMQ_VIRTUALHOST</em>, <em>username=settings.RABBITMQ_USERNAME</em>, <em>password=settings.RABBITMQ_PASSWORD</em>, <em>exchange_name='direct'</em>, <em>exchange_type='direct'</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/publisher.html#Publisher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.publisher.Publisher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="django_event.rabbitmq.html#django_event.rabbitmq.client.RabbitMQClient" title="django_event.rabbitmq.client.RabbitMQClient"><tt class="xref py py-class docutils literal"><span class="pre">django_event.rabbitmq.client.RabbitMQClient</span></tt></a></p>
+<p>Base publisher class. Asynchronous by default.</p>
+<dl class="method">
+<dt id="django_event.publisher.publisher.Publisher.publish_message">
+<tt class="descname">publish_message</tt><big>(</big><em>message</em>, <em>content_type='application/json'</em>, <em>routing_key=''</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/publisher.html#Publisher.publish_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.publisher.Publisher.publish_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends given message with specified content type and routing key.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>message</strong> (<em>serializable object</em>) &#8211; Message.</li>
+<li><strong>content_type</strong> (<tt class="xref py py-class docutils literal"><span class="pre">str</span></tt>) &#8211; Message content type.</li>
+<li><strong>routing_key</strong> (<tt class="xref py py-class docutils literal"><span class="pre">str</span></tt>) &#8211; Routing key, see RabbitMQ docs for more info.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-django_event.publisher.request">
+<span id="django-event-publisher-request"></span><h2>django_event.publisher.request<a class="headerlink" href="#module-django_event.publisher.request" title="Permalink to this headline">¶</a></h2>
+<p>Event request module.</p>
+<p>Usage examples:
+You can pass custom arguments into decorated function which are not required.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">EventRequest</span><span class="p">(</span><span class="n">django_request</span><span class="p">,</span> <span class="n">custom_argument</span><span class="o">=</span><span class="mi">123</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>But django request is must for event.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">EventRequest</span><span class="p">(</span><span class="n">django_request</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="class">
+<dt id="django_event.publisher.request._DummyRequest">
+<em class="property">class </em><tt class="descclassname">django_event.publisher.request.</tt><tt class="descname">_DummyRequest</tt><big>(</big><em>data</em>, <em>user</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/request.html#_DummyRequest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.request._DummyRequest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Private class that emulates Django Request class.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django_event.publisher.request._DummyUser">
+<em class="property">class </em><tt class="descclassname">django_event.publisher.request.</tt><tt class="descname">_DummyUser</tt><big>(</big><em>user_id</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/request.html#_DummyUser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.request._DummyUser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Private class that emulates Django User class.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django_event.publisher.request.EventRequest">
+<em class="property">class </em><tt class="descclassname">django_event.publisher.request.</tt><tt class="descname">EventRequest</tt><big>(</big><em>django_request</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/request.html#EventRequest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.request.EventRequest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Event request class user to pass arguments to decorated events.</p>
+<dl class="method">
+<dt id="django_event.publisher.request.EventRequest.__getattr__">
+<tt class="descname">__getattr__</tt><big>(</big><em>item</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/request.html#EventRequest.__getattr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.request.EventRequest.__getattr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Magick method for dot notation for custom task arguments.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="django_event.publisher.request.EventRequest.deserialize">
+<em class="property">static </em><tt class="descname">deserialize</tt><big>(</big><em>json_request</em>, <em>return_dummy=False</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/request.html#EventRequest.deserialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.request.EventRequest.deserialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deserialize JSON request and returns EventRequest instance or
+dict which contains Dummy classes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>json_request</strong> (<tt class="xref py py-class docutils literal"><span class="pre">str</span></tt>) &#8211; JSON serialized event request.</li>
+<li><strong>return_dummy</strong> (<tt class="xref py py-class docutils literal"><span class="pre">bool</span></tt>) &#8211; Return EventRequest or dict with dummies.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Deserialized instance.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#django_event.publisher.request.EventRequest" title="django_event.publisher.request.EventRequest"><tt class="xref py py-class docutils literal"><span class="pre">EventRequest</span></tt></a> or <tt class="xref py py-class docutils literal"><span class="pre">dict</span></tt></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.publisher.request.EventRequest.serialize">
+<tt class="descname">serialize</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/django_event/publisher/request.html#EventRequest.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.request.EventRequest.serialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize event request into JSON for database storing.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">JSON serialized event request.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><tt class="xref py py-class docutils literal"><span class="pre">str</span></tt></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-django_event.publisher.views">
+<span id="django-event-publisher-views"></span><h2>django_event.publisher.views<a class="headerlink" href="#module-django_event.publisher.views" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="django_event.publisher.views.CancelEventBaseView">
+<em class="property">class </em><tt class="descclassname">django_event.publisher.views.</tt><tt class="descname">CancelEventBaseView</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/views.html#CancelEventBaseView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.views.CancelEventBaseView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#django_event.publisher.views.LoginRequiredMixin" title="django_event.publisher.views.LoginRequiredMixin"><tt class="xref py py-class docutils literal"><span class="pre">django_event.publisher.views.LoginRequiredMixin</span></tt></a>, <a class="reference internal" href="#django_event.publisher.views.EventDetailMixin" title="django_event.publisher.views.EventDetailMixin"><tt class="xref py py-class docutils literal"><span class="pre">django_event.publisher.views.EventDetailMixin</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">django.views.generic.base.View</span></tt></p>
+<p>Base cancel event view class.</p>
+<dl class="method">
+<dt id="django_event.publisher.views.CancelEventBaseView.cancel">
+<tt class="descname">cancel</tt><big>(</big><em>pk</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/views.html#CancelEventBaseView.cancel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.views.CancelEventBaseView.cancel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if event is successfully canceled False otherwise.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pk</strong> (<tt class="xref py py-class docutils literal"><span class="pre">int</span></tt>) &#8211; Event id.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if canceled else False.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><tt class="xref py py-class docutils literal"><span class="pre">bool</span></tt></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.publisher.views.CancelEventBaseView.post">
+<tt class="descname">post</tt><big>(</big><em>request</em>, <em>pk</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/views.html#CancelEventBaseView.post"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.views.CancelEventBaseView.post" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="django_event.publisher.views.EventDetailBaseView">
+<em class="property">class </em><tt class="descclassname">django_event.publisher.views.</tt><tt class="descname">EventDetailBaseView</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/views.html#EventDetailBaseView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.views.EventDetailBaseView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#django_event.publisher.views.LoginRequiredMixin" title="django_event.publisher.views.LoginRequiredMixin"><tt class="xref py py-class docutils literal"><span class="pre">django_event.publisher.views.LoginRequiredMixin</span></tt></a>, <a class="reference internal" href="#django_event.publisher.views.EventDetailMixin" title="django_event.publisher.views.EventDetailMixin"><tt class="xref py py-class docutils literal"><span class="pre">django_event.publisher.views.EventDetailMixin</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">django.views.generic.detail.DetailView</span></tt></p>
+<p>Base event detail view class.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django_event.publisher.views.EventDetailMixin">
+<em class="property">class </em><tt class="descclassname">django_event.publisher.views.</tt><tt class="descname">EventDetailMixin</tt><a class="reference internal" href="_modules/django_event/publisher/views.html#EventDetailMixin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.views.EventDetailMixin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#django_event.publisher.views.EventListMixin" title="django_event.publisher.views.EventListMixin"><tt class="xref py py-class docutils literal"><span class="pre">django_event.publisher.views.EventListMixin</span></tt></a></p>
+<p>Event view mixin class with overrided <a class="reference internal" href="#django_event.publisher.views.EventDetailMixin.get_object" title="django_event.publisher.views.EventDetailMixin.get_object"><tt class="xref py py-func docutils literal"><span class="pre">get_object()</span></tt></a> method.</p>
+<dl class="method">
+<dt id="django_event.publisher.views.EventDetailMixin.get_object">
+<tt class="descname">get_object</tt><big>(</big><em>pk</em>, <em>queryset=None</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/views.html#EventDetailMixin.get_object"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.views.EventDetailMixin.get_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns user-owned event by id.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">QuerySet of user-owned events.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><tt class="xref py py-class docutils literal"><span class="pre">Event</span></tt></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="django_event.publisher.views.EventListBaseView">
+<em class="property">class </em><tt class="descclassname">django_event.publisher.views.</tt><tt class="descname">EventListBaseView</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/views.html#EventListBaseView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.views.EventListBaseView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#django_event.publisher.views.LoginRequiredMixin" title="django_event.publisher.views.LoginRequiredMixin"><tt class="xref py py-class docutils literal"><span class="pre">django_event.publisher.views.LoginRequiredMixin</span></tt></a>, <a class="reference internal" href="#django_event.publisher.views.EventListMixin" title="django_event.publisher.views.EventListMixin"><tt class="xref py py-class docutils literal"><span class="pre">django_event.publisher.views.EventListMixin</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">django.views.generic.list.ListView</span></tt></p>
+<p>Base event list view class.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django_event.publisher.views.EventListMixin">
+<em class="property">class </em><tt class="descclassname">django_event.publisher.views.</tt><tt class="descname">EventListMixin</tt><a class="reference internal" href="_modules/django_event/publisher/views.html#EventListMixin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.views.EventListMixin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Event view mixin class with overrided <a class="reference internal" href="#django_event.publisher.views.EventListMixin.get_queryset" title="django_event.publisher.views.EventListMixin.get_queryset"><tt class="xref py py-func docutils literal"><span class="pre">get_queryset()</span></tt></a> method.</p>
+<dl class="method">
+<dt id="django_event.publisher.views.EventListMixin.get_queryset">
+<tt class="descname">get_queryset</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/django_event/publisher/views.html#EventListMixin.get_queryset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.views.EventListMixin.get_queryset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns user-owned events.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">QuerySet of user-owned events.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><tt class="xref py py-class docutils literal"><span class="pre">EventQuerySet</span></tt></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django_event.publisher.views.EventListMixin.model">
+<tt class="descname">model</tt><a class="headerlink" href="#django_event.publisher.views.EventListMixin.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">Event</span></tt></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="django_event.publisher.views.LoginRequiredMixin">
+<em class="property">class </em><tt class="descclassname">django_event.publisher.views.</tt><tt class="descname">LoginRequiredMixin</tt><a class="reference internal" href="_modules/django_event/publisher/views.html#LoginRequiredMixin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.views.LoginRequiredMixin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Event view mixin class with overrided <a class="reference internal" href="#django_event.publisher.views.LoginRequiredMixin.dispatch" title="django_event.publisher.views.LoginRequiredMixin.dispatch"><tt class="xref py py-func docutils literal"><span class="pre">dispatch()</span></tt></a> method to restrict
+anonymous users.</p>
+<dl class="method">
+<dt id="django_event.publisher.views.LoginRequiredMixin.dispatch">
+<tt class="descname">dispatch</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/views.html#LoginRequiredMixin.dispatch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.views.LoginRequiredMixin.dispatch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override dispatch to implement auth restriction.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> (<tt class="xref py py-class docutils literal"><span class="pre">HttpRequest</span></tt>) &#8211; Incoming request.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Response.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><tt class="xref py py-class docutils literal"><span class="pre">HttpResponse</span></tt></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="django_event.publisher.views.RetryEventBaseView">
+<em class="property">class </em><tt class="descclassname">django_event.publisher.views.</tt><tt class="descname">RetryEventBaseView</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/views.html#RetryEventBaseView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.views.RetryEventBaseView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#django_event.publisher.views.LoginRequiredMixin" title="django_event.publisher.views.LoginRequiredMixin"><tt class="xref py py-class docutils literal"><span class="pre">django_event.publisher.views.LoginRequiredMixin</span></tt></a>, <a class="reference internal" href="#django_event.publisher.views.EventDetailMixin" title="django_event.publisher.views.EventDetailMixin"><tt class="xref py py-class docutils literal"><span class="pre">django_event.publisher.views.EventDetailMixin</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">django.views.generic.base.View</span></tt></p>
+<p>Base retry event view class.</p>
+<dl class="method">
+<dt id="django_event.publisher.views.RetryEventBaseView.post">
+<tt class="descname">post</tt><big>(</big><em>request</em>, <em>pk</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/views.html#RetryEventBaseView.post"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.views.RetryEventBaseView.post" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="django_event.publisher.views.RetryEventBaseView.retry">
+<tt class="descname">retry</tt><big>(</big><em>pk</em><big>)</big><a class="reference internal" href="_modules/django_event/publisher/views.html#RetryEventBaseView.retry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.publisher.views.RetryEventBaseView.retry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns new event id if it successfully retried event None otherwise.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pk</strong> (<tt class="xref py py-class docutils literal"><span class="pre">int</span></tt>) &#8211; Event id.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">New event id if retried else None.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><tt class="xref py py-class docutils literal"><span class="pre">int</span></tt> or None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="django_event.publisher.rest_framework.html" class="btn btn-neutral float-right" title="django_event.publisher.rest_framework"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="django_event.management.commands.html" class="btn btn-neutral" title="django_event.management.commands"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014, Dmitry Panchenko.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.3.2',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

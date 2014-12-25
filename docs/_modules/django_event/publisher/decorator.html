@@ -1,0 +1,354 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>django_event.publisher.decorator &mdash; django_event 0.3.2 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="django_event 0.3.2 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../../../index.html" class="fa fa-home"> django_event</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../django_event.html">django_event</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../django_event.management.html">django_event.management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../django_event.publisher.html">django_event.publisher</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../django_event.rabbitmq.html">django_event.rabbitmq</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../django_event.subscriber.html">django_event.subscriber</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../django_event.html#module-django_event.utils">django_event.utils</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">django_event</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>django_event.publisher.decorator</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <h1>Source code for django_event.publisher.decorator</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Core publisher client module.</span>
+<span class="sd">Basically you should use this decorator instead of manually write events into</span>
+<span class="sd">database.</span>
+<span class="sd">Decorator specifies some overridable methods if you need basic customization.</span>
+
+<span class="sd">Usage examples:</span>
+
+<span class="sd">Defining event task: ::</span>
+
+<span class="sd">    @event(event_type=&#39;some_type&#39;, routing_strategy=&#39;&#39;)</span>
+<span class="sd">    def some_task(event_request, event):</span>
+<span class="sd">        argument = event_request.custom_argument</span>
+<span class="sd">        return some_processed_data(event_request.data, event)</span>
+
+<span class="sd">And call: ::</span>
+
+<span class="sd">    some_task.delay(EventRequest(django_request, custom_argument=123))</span>
+
+<span class="sd">You can know more about .delay() or other methods in Celery docs.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;event&#39;</span><span class="p">]</span>
+
+
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+
+<span class="kn">from</span> <span class="nn">celery</span> <span class="kn">import</span> <span class="n">task</span>
+<span class="kn">from</span> <span class="nn">celery</span> <span class="kn">import</span> <span class="n">current_task</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth</span> <span class="kn">import</span> <span class="n">get_user_model</span>
+
+<span class="kn">from</span> <span class="nn">.exceptions</span> <span class="kn">import</span> <span class="n">EventError</span>
+<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">Event</span>
+
+
+<div class="viewcode-block" id="event"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.decorator.event">[docs]</a><span class="k">class</span> <span class="nc">event</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Main client publisher interface.</span>
+<span class="sd">    Decorates function and return celery task.</span>
+
+<span class="sd">    Automatically start and end event after celery started/completed the</span>
+<span class="sd">    task. You must pass EventRequest into decorated function.</span>
+<span class="sd">    :class:`EventRequest` can accept keyword arguments needed by wrapped</span>
+<span class="sd">    function which are not required but django request are required by internal</span>
+<span class="sd">    needs. This decorator automatically set :class:`EventRequest` and</span>
+<span class="sd">    :class:`Event` instances as wrapped function arguments.</span>
+
+<span class="sd">    Wrapped func may raise specific exception :class:`EventError` used to notify</span>
+<span class="sd">    subscribers about failure. Basically this decorator will handle only that</span>
+<span class="sd">    type of exceptions. Be sure you handle all raised exception in wrapped func</span>
+<span class="sd">    otherwise it will pass outside decorator and into database as well.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="event.__init__"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.decorator.event.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">event_type</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+                 <span class="n">send_mail</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                 <span class="n">progress_throttling</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+                 <span class="n">routing_strategy</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+                 <span class="n">task_kwargs</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">on_start</span><span class="o">=</span><span class="k">lambda</span> <span class="n">_event</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                 <span class="n">on_success</span><span class="o">=</span><span class="k">lambda</span> <span class="n">_event</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                 <span class="n">on_error</span><span class="o">=</span><span class="k">lambda</span> <span class="n">_event</span><span class="p">:</span> <span class="bp">None</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param event_type: Event type, using in message routing.</span>
+<span class="sd">        :type event_type: :class:`str`</span>
+
+<span class="sd">        :param send_mail: Send email after event is done.</span>
+<span class="sd">        :type send_mail: :class:`bool`</span>
+
+<span class="sd">        :param progress_throttling: Describes how often event will send</span>
+<span class="sd">         progress messages. See :class:`Event` docs for more information</span>
+<span class="sd">         about this parameter.</span>
+<span class="sd">        :type progress_throttling: :class:`float`</span>
+
+<span class="sd">        :param routing_strategy: Routing strategy e.g. what listeners will do</span>
+<span class="sd">         with messages. Empty strategy means you want to deliver notification to</span>
+<span class="sd">         all subscribed clients. See :class:`Event` docs for more information</span>
+<span class="sd">         about this parameter.</span>
+<span class="sd">        :type routing_strategy: :class:`str`</span>
+
+<span class="sd">        :param task_kwargs: Celery task arguments.</span>
+<span class="sd">        :type task_kwargs: :class:`dict`</span>
+
+<span class="sd">        :param on_start: Event start callback.</span>
+<span class="sd">        :type on_start: :class:`str`</span>
+
+<span class="sd">        :param on_success: Event success callback.</span>
+<span class="sd">        :type on_success: callable object</span>
+
+<span class="sd">        :param on_error: Event error callback.</span>
+<span class="sd">        :type on_error: callable object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_event_type</span> <span class="o">=</span> <span class="n">event_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_send_mail</span> <span class="o">=</span> <span class="n">send_mail</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_routing_strategy</span> <span class="o">=</span> <span class="n">routing_strategy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_progress_throttling</span> <span class="o">=</span> <span class="n">progress_throttling</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_task_kwargs</span> <span class="o">=</span> <span class="n">task_kwargs</span> <span class="ow">or</span> <span class="p">{}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_on_start</span> <span class="o">=</span> <span class="n">on_start</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_on_success</span> <span class="o">=</span> <span class="n">on_success</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_on_error</span> <span class="o">=</span> <span class="n">on_error</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_user</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_event_request</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_event</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_result</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="c">############################################################################</span>
+    <span class="c"># CORE METHODS</span>
+    <span class="c">############################################################################</span>
+</div>
+<div class="viewcode-block" id="event.create_event"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.decorator.event.create_event">[docs]</a>    <span class="k">def</span> <span class="nf">create_event</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create event model with passing arguments.</span>
+<span class="sd">        Basically you dont need to manually create event.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_event</span> <span class="o">=</span> <span class="n">Event</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">progress_throttling</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_progress_throttling</span><span class="p">,</span>
+            <span class="n">routing_strategy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_routing_strategy</span><span class="p">,</span>
+            <span class="n">user</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_user</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_event_type</span><span class="p">,</span>
+            <span class="n">send_mail</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_send_mail</span><span class="p">,</span>
+            <span class="n">task_id</span><span class="o">=</span><span class="n">current_task</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="n">task_name</span><span class="o">=</span><span class="n">current_task</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">event_request</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_event_request</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_event</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="event.__call__"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.decorator.event.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Wraps passed function into Celery :class:`Task`.</span>
+
+<span class="sd">        :param func: Function to be wrapped.</span>
+<span class="sd">        :type func: callable object</span>
+
+<span class="sd">        :return: Celery task instance.</span>
+<span class="sd">        :rtype: Celery :class:`Task`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nd">@task</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_task_kwargs</span><span class="p">)</span>
+        <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">wrapped</span><span class="p">(</span><span class="n">event_request</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_event_request</span> <span class="o">=</span> <span class="n">event_request</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_user</span> <span class="o">=</span> <span class="n">get_user_model</span><span class="p">()</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_event_request</span><span class="o">.</span><span class="n">user_id</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_send_mail</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_event_request</span><span class="o">.</span><span class="n">send_mail</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_mail</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">create_event</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">start_event</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_event_request</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_event</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">EventError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_result</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">message</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">complete_event</span><span class="p">()</span>
+
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_result</span>
+
+        <span class="k">return</span> <span class="n">wrapped</span>
+
+    <span class="c">############################################################################</span>
+    <span class="c"># OVERRIDABLE METHODS</span>
+    <span class="c">############################################################################</span>
+</div>
+<div class="viewcode-block" id="event.start_event"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.decorator.event.start_event">[docs]</a>    <span class="k">def</span> <span class="nf">start_event</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Starts event.</span>
+<span class="sd">        Override this if you want to customize message.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_event</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_on_start</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="event.complete_event"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.decorator.event.complete_event">[docs]</a>    <span class="k">def</span> <span class="nf">complete_event</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Ends event.</span>
+<span class="sd">        Override this if you want to customize message.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_event</span><span class="o">.</span><span class="n">complete</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_result</span><span class="p">,</span>
+            <span class="n">status</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_status</span><span class="p">,</span>
+            <span class="n">callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_on_success</span><span class="p">,</span>
+            <span class="n">errback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_on_error</span>
+        <span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014, Dmitry Panchenko.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.3.2',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

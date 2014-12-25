@@ -1,0 +1,285 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>django_event.publisher.request &mdash; django_event 0.3.2 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="django_event 0.3.2 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../../../index.html" class="fa fa-home"> django_event</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../django_event.html">django_event</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../django_event.management.html">django_event.management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../django_event.publisher.html">django_event.publisher</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../django_event.rabbitmq.html">django_event.rabbitmq</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../django_event.subscriber.html">django_event.subscriber</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../django_event.html#module-django_event.utils">django_event.utils</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">django_event</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>django_event.publisher.request</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <h1>Source code for django_event.publisher.request</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Event request module.</span>
+
+<span class="sd">Usage examples:</span>
+<span class="sd">You can pass custom arguments into decorated function which are not required. ::</span>
+
+<span class="sd">   EventRequest(django_request, custom_argument=123)</span>
+
+<span class="sd">But django request is must for event. ::</span>
+
+<span class="sd">   EventRequest(django_request)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="kn">import</span> <span class="nn">json</span>
+
+
+<div class="viewcode-block" id="_DummyUser"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.request._DummyUser">[docs]</a><span class="k">class</span> <span class="nc">_DummyUser</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Private class that emulates Django User class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Only id needed.</span>
+
+<span class="sd">        :param user_id: Django user id.</span>
+<span class="sd">        :type user_id: :class:`int`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">user_id</span>
+
+</div>
+<div class="viewcode-block" id="_DummyRequest"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.request._DummyRequest">[docs]</a><span class="k">class</span> <span class="nc">_DummyRequest</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Private class that emulates Django Request class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">user</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Only user and data needed.</span>
+
+<span class="sd">        :param data: Django request data</span>
+<span class="sd">        :type data: :class:`QueryDict`</span>
+
+<span class="sd">        :param user: Django user</span>
+<span class="sd">        :type user: :class:`User` or :class:`_DummyUser`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">user</span>
+
+</div>
+<div class="viewcode-block" id="EventRequest"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.request.EventRequest">[docs]</a><span class="k">class</span> <span class="nc">EventRequest</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Event request class user to pass arguments to decorated events.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">django_request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Copies django request data and set some internal arguments.</span>
+
+<span class="sd">        :param django_request: Django request.</span>
+<span class="sd">        :type django_request: :class:`Request` or :class:`_RequestDummy`</span>
+
+<span class="sd">        :param kwargs: Custom arguments needed by task.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">django_request</span><span class="o">.</span><span class="n">DATA</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_id</span> <span class="o">=</span> <span class="n">django_request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_mail</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&#39;send_mail&#39;</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">custom_args</span> <span class="o">=</span> <span class="n">kwargs</span>
+
+<div class="viewcode-block" id="EventRequest.__getattr__"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.request.EventRequest.__getattr__">[docs]</a>    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Magick method for dot notation for custom task arguments.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getattribute__</span><span class="p">(</span><span class="s">&#39;custom_args&#39;</span><span class="p">)[</span><span class="n">item</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="EventRequest.serialize"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.request.EventRequest.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Serialize event request into JSON for database storing.</span>
+
+<span class="sd">        :return: JSON serialized event request.</span>
+<span class="sd">        :rtype: :class:`str`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span>
+            <span class="s">&#39;data&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+            <span class="s">&#39;user_id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+            <span class="s">&#39;send_mail&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_mail</span><span class="p">,</span>
+            <span class="s">&#39;custom_args&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">custom_args</span>
+        <span class="p">})</span>
+</div>
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="EventRequest.deserialize"><a class="viewcode-back" href="../../../django_event.publisher.html#django_event.publisher.request.EventRequest.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="n">json_request</span><span class="p">,</span> <span class="n">return_dummy</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Deserialize JSON request and returns EventRequest instance or</span>
+<span class="sd">        dict which contains Dummy classes.</span>
+
+<span class="sd">        :param json_request: JSON serialized event request.</span>
+<span class="sd">        :type json_request: :class:`str`</span>
+
+<span class="sd">        :param return_dummy: Return EventRequest or dict with dummies.</span>
+<span class="sd">        :type return_dummy: :class:`bool`</span>
+
+<span class="sd">        :return: Deserialized instance.</span>
+<span class="sd">        :rtype: :class:`EventRequest` or :class:`dict`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">dicted_request</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json_request</span><span class="p">)</span>
+
+        <span class="n">user</span> <span class="o">=</span> <span class="n">_DummyUser</span><span class="p">(</span><span class="n">dicted_request</span><span class="p">[</span><span class="s">&#39;user_id&#39;</span><span class="p">])</span>
+        <span class="n">request</span> <span class="o">=</span> <span class="n">_DummyRequest</span><span class="p">(</span><span class="n">dicted_request</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">],</span> <span class="n">user</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">return_dummy</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">request</span><span class="p">,</span> <span class="n">dicted_request</span><span class="p">[</span><span class="s">&#39;custom_args&#39;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">EventRequest</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">dicted_request</span><span class="p">[</span><span class="s">&#39;custom_args&#39;</span><span class="p">])</span></div></div>
+</pre></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014, Dmitry Panchenko.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.3.2',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

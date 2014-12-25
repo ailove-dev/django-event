@@ -1,0 +1,238 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Welcome to django_event’s documentation! &mdash; django_event 0.3.2 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="django_event 0.3.2 documentation" href="#"/>
+        <link rel="next" title="django_event" href="django_event.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="#" class="fa fa-home"> django_event</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul>
+<li class="toctree-l1"><a class="reference internal" href="django_event.html">django_event</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="django_event.management.html">django_event.management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="django_event.publisher.html">django_event.publisher</a></li>
+<li class="toctree-l2"><a class="reference internal" href="django_event.rabbitmq.html">django_event.rabbitmq</a></li>
+<li class="toctree-l2"><a class="reference internal" href="django_event.subscriber.html">django_event.subscriber</a></li>
+<li class="toctree-l2"><a class="reference internal" href="django_event.html#module-django_event.utils">django_event.utils</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="#">django_event</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="#">Docs</a> &raquo;</li>
+      
+    <li>Welcome to django_event&#8217;s documentation!</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/index.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <div class="section" id="welcome-to-django-event-s-documentation">
+<h1>Welcome to django_event&#8217;s documentation!<a class="headerlink" href="#welcome-to-django-event-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Django Event is notification system framework that allows you to push notifications to the browser.</p>
+<div class="section" id="installing">
+<h2>Installing<a class="headerlink" href="#installing" title="Permalink to this headline">¶</a></h2>
+<p>First you need pip.
+Use your OS&#8217;s package system to install it.
+On ubuntu you can install it like this:</p>
+<div class="highlight-python"><div class="highlight"><pre>apt-get install python-pip
+</pre></div>
+</div>
+<p>And it is highly recommended you to use python virtual environment. See <a class="reference external" href="https://virtualenv.readthedocs.org/en/latest/">Virtualenv docs</a>.</p>
+<p>After that you need to install django-event:</p>
+<div class="highlight-python"><div class="highlight"><pre>pip install git+https://github.com/ailove-dev/django-event
+</pre></div>
+</div>
+<p>If you use Django Rest Framework and want to django-event provided REST api&#8217;s for events use following command:</p>
+<div class="highlight-python"><div class="highlight"><pre>pip install git+https://github.com/ailove-dev/django-event[rest_framework_api]
+</pre></div>
+</div>
+<p>Contents:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="django_event.html">django_event</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="django_event.management.html">django_event.management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="django_event.management.commands.html">django_event.management.commands</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="django_event.management.commands.html#module-django_event.management.commands.deleteoldevents">django_event.management.commands.deleteoldevents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="django_event.management.commands.html#module-django_event.management.commands.runwebsocketserver">django_event.management.commands.runwebsocketserver</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="django_event.publisher.html">django_event.publisher</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="django_event.publisher.rest_framework.html">django_event.publisher.rest_framework</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="django_event.publisher.rest_framework.html#module-django_event.publisher.rest_framework.serializers">django_event.publisher.serializers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="django_event.publisher.rest_framework.html#module-django_event.publisher.rest_framework.urls">django_event.publisher.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="django_event.publisher.rest_framework.html#module-django_event.publisher.rest_framework.views">django_event.publisher.views</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="django_event.publisher.html#module-django_event.publisher.decorator">django_event.publisher.decorator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="django_event.publisher.html#module-django_event.publisher.exceptions">django_event.publisher.exceptions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="django_event.publisher.html#module-django_event.publisher.models">django_event.publisher.models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="django_event.publisher.html#module-django_event.publisher.publisher">django_event.publisher.publisher</a></li>
+<li class="toctree-l3"><a class="reference internal" href="django_event.publisher.html#module-django_event.publisher.request">django_event.publisher.request</a></li>
+<li class="toctree-l3"><a class="reference internal" href="django_event.publisher.html#module-django_event.publisher.views">django_event.publisher.views</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="django_event.rabbitmq.html">django_event.rabbitmq</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="django_event.rabbitmq.html#module-django_event.rabbitmq.client">django_event.rabbitmq.client</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="django_event.subscriber.html">django_event.subscriber</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="django_event.subscriber.html#module-django_event.subscriber.connection">django_event.subscriber.connection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="django_event.subscriber.html#module-django_event.subscriber.listeners">django_event.subscriber.listeners</a></li>
+<li class="toctree-l3"><a class="reference internal" href="django_event.subscriber.html#module-django_event.subscriber.subscriber">django_event.subscriber.subscriber</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="django_event.html#module-django_event.utils">django_event.utils</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
+<li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
+<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+</ul>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="django_event.html" class="btn btn-neutral float-right" title="django_event"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014, Dmitry Panchenko.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.3.2',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

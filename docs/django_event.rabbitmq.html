@@ -1,0 +1,264 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>django_event.rabbitmq &mdash; django_event 0.3.2 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="django_event 0.3.2 documentation" href="index.html"/>
+        <link rel="up" title="django_event" href="django_event.html"/>
+        <link rel="next" title="django_event.subscriber" href="django_event.subscriber.html"/>
+        <link rel="prev" title="django_event.publisher.rest_framework" href="django_event.publisher.rest_framework.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="fa fa-home"> django_event</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="django_event.html">django_event</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="django_event.management.html">django_event.management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="django_event.publisher.html">django_event.publisher</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">django_event.rabbitmq</a></li>
+<li class="toctree-l2"><a class="reference internal" href="django_event.subscriber.html">django_event.subscriber</a></li>
+<li class="toctree-l2"><a class="reference internal" href="django_event.html#module-django_event.utils">django_event.utils</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">django_event</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="django_event.html">django_event</a> &raquo;</li>
+      
+    <li>django_event.rabbitmq</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/django_event.rabbitmq.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <div class="section" id="django-event-rabbitmq">
+<h1>django_event.rabbitmq<a class="headerlink" href="#django-event-rabbitmq" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-django_event.rabbitmq.client">
+<span id="django-event-rabbitmq-client"></span><h2>django_event.rabbitmq.client<a class="headerlink" href="#module-django_event.rabbitmq.client" title="Permalink to this headline">¶</a></h2>
+<p>Base RabbitMQ client module.
+You basically don&#8217;t need to use this module.</p>
+<dl class="class">
+<dt id="django_event.rabbitmq.client.RabbitMQClient">
+<em class="property">class </em><tt class="descclassname">django_event.rabbitmq.client.</tt><tt class="descname">RabbitMQClient</tt><big>(</big><em>host=settings.RABBITMQ_HOST</em>, <em>port=settings.RABBITMQ_PORT</em>, <em>virtual_host=settings.RABBITMQ_VIRTUALHOST</em>, <em>username=settings.RABBITMQ_USERNAME</em>, <em>password=settings.RABBITMQ_PASSWORD</em>, <em>exchange_name='direct'</em>, <em>exchange_type='direct'</em><big>)</big><a class="reference internal" href="_modules/django_event/rabbitmq/client.html#RabbitMQClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.rabbitmq.client.RabbitMQClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Base RabbitMQ asynchronous adapter.</p>
+<dl class="method">
+<dt id="django_event.rabbitmq.client.RabbitMQClient.on_channel_open">
+<tt class="descname">on_channel_open</tt><big>(</big><em>channel</em>, <em>callback=lambda frame: None</em><big>)</big><a class="reference internal" href="_modules/django_event/rabbitmq/client.html#RabbitMQClient.on_channel_open"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.rabbitmq.client.RabbitMQClient.on_channel_open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback on channel open. It will declare exchanges for messaging. See
+RabbitMQ docs for more information.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>channel</strong> (<tt class="xref py py-class docutils literal"><span class="pre">Channel</span></tt>) &#8211; Opened channel.</li>
+<li><strong>callback</strong> (<em>callable object</em>) &#8211; Callback that will be executed after channel open.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.rabbitmq.client.RabbitMQClient.connect">
+<tt class="descname">connect</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/django_event/rabbitmq/client.html#RabbitMQClient.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.rabbitmq.client.RabbitMQClient.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Asynchronous connection. Connects to RabbitMQ server and establish
+non-blocking connection. After connection is established on_connected
+callback will be executed which will try to reconnect if this function
+failed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.rabbitmq.client.RabbitMQClient.disconnect">
+<tt class="descname">disconnect</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/django_event/rabbitmq/client.html#RabbitMQClient.disconnect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.rabbitmq.client.RabbitMQClient.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disconnect method.
+Call this method after you end with messaging.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.rabbitmq.client.RabbitMQClient.on_close">
+<tt class="descname">on_close</tt><big>(</big><em>connection</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/django_event/rabbitmq/client.html#RabbitMQClient.on_close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.rabbitmq.client.RabbitMQClient.on_close" title="Permalink to this definition">¶</a></dt>
+<dd><p>On close callback.
+You don&#8217;t need to manually call this method.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>connection</strong> (<tt class="xref py py-class docutils literal"><span class="pre">TornadoConnection</span></tt>) &#8211; Established connection.</li>
+<li><strong>args</strong> &#8211; Internal args</li>
+<li><strong>kwargs</strong> &#8211; Internal kwargs</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.rabbitmq.client.RabbitMQClient.on_connected">
+<tt class="descname">on_connected</tt><big>(</big><em>connection</em><big>)</big><a class="reference internal" href="_modules/django_event/rabbitmq/client.html#RabbitMQClient.on_connected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.rabbitmq.client.RabbitMQClient.on_connected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback on connection. Reconnect if connection dropped. Otherwise it
+will open channel and on_channel_open callback will be executed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>connection</strong> (<tt class="xref py py-class docutils literal"><span class="pre">TornadoConnection</span></tt>) &#8211; RabbitMQ connection.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.rabbitmq.client.RabbitMQClient.reconnect">
+<tt class="descname">reconnect</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/django_event/rabbitmq/client.html#RabbitMQClient.reconnect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.rabbitmq.client.RabbitMQClient.reconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reconnect method.
+Basically you don&#8217;t need to call this method manually.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="django_event.subscriber.html" class="btn btn-neutral float-right" title="django_event.subscriber"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="django_event.publisher.rest_framework.html" class="btn btn-neutral" title="django_event.publisher.rest_framework"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014, Dmitry Panchenko.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.3.2',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

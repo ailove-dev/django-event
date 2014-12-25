@@ -1,0 +1,532 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>django_event.subscriber &mdash; django_event 0.3.2 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="django_event 0.3.2 documentation" href="index.html"/>
+        <link rel="up" title="django_event" href="django_event.html"/>
+        <link rel="prev" title="django_event.rabbitmq" href="django_event.rabbitmq.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="fa fa-home"> django_event</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="django_event.html">django_event</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="django_event.management.html">django_event.management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="django_event.publisher.html">django_event.publisher</a></li>
+<li class="toctree-l2"><a class="reference internal" href="django_event.rabbitmq.html">django_event.rabbitmq</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">django_event.subscriber</a></li>
+<li class="toctree-l2"><a class="reference internal" href="django_event.html#module-django_event.utils">django_event.utils</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">django_event</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="django_event.html">django_event</a> &raquo;</li>
+      
+    <li>django_event.subscriber</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/django_event.subscriber.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <div class="section" id="django-event-subscriber">
+<h1>django_event.subscriber<a class="headerlink" href="#django-event-subscriber" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-django_event.subscriber.connection">
+<span id="django-event-subscriber-connection"></span><h2>django_event.subscriber.connection<a class="headerlink" href="#module-django_event.subscriber.connection" title="Permalink to this headline">¶</a></h2>
+<p>Core event server module.
+Provides basic websocket connection and subscribe/unsubscribe message system.</p>
+<dl class="class">
+<dt id="django_event.subscriber.connection._Request">
+<em class="property">class </em><tt class="descclassname">django_event.subscriber.connection.</tt><tt class="descname">_Request</tt><a class="reference internal" href="_modules/django_event/subscriber/connection.html#_Request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.subscriber.connection._Request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Private class that emulates Django Request class.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django_event.subscriber.connection.EventConnection">
+<em class="property">class </em><tt class="descclassname">django_event.subscriber.connection.</tt><tt class="descname">EventConnection</tt><big>(</big><em>session</em><big>)</big><a class="reference internal" href="_modules/django_event/subscriber/connection.html#EventConnection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.subscriber.connection.EventConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">sockjs.tornado.conn.SockJSConnection</span></tt></p>
+<p>SockJS connection handler.</p>
+<dl class="attribute">
+<dt id="django_event.subscriber.connection.EventConnection.executor">
+<tt class="descname">executor</tt><em class="property"> = ThreadPoolExecutor(max_workers=cpu_count())</em><a class="headerlink" href="#django_event.subscriber.connection.EventConnection.executor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Thread pool for synchronous methods</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.subscriber.connection.EventConnection.authenticate">
+<tt class="descname">authenticate</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/django_event/subscriber/connection.html#EventConnection.authenticate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.subscriber.connection.EventConnection.authenticate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Authenticates user by session key.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> (<em>Tornado Request</em>) &#8211; Request given on connection open.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Authenticated user.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">Django User</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.subscriber.connection.EventConnection.on_close">
+<tt class="descname">on_close</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/django_event/subscriber/connection.html#EventConnection.on_close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.subscriber.connection.EventConnection.on_close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Asynchronous callback.
+Called internally by base class on connection closed.
+Unsubscribes all event listeners.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.subscriber.connection.EventConnection.on_message">
+<tt class="descname">on_message</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/django_event/subscriber/connection.html#EventConnection.on_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.subscriber.connection.EventConnection.on_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Asynchronous callback.
+Called internally by base class on message received.
+Provides message routing. Subscribes and unsubscribes on messages types.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>message</strong> (<tt class="xref py py-class docutils literal"><span class="pre">str</span></tt>) &#8211; JSON message received from RabbitMQ.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.subscriber.connection.EventConnection.on_open">
+<tt class="descname">on_open</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/django_event/subscriber/connection.html#EventConnection.on_open"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.subscriber.connection.EventConnection.on_open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Asynchronous callback. Basic authentication by session implemented.
+Called internally by base class on connection opened.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> (<em>Tornado Request</em>) &#8211; Request given on connection open.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.subscriber.connection.EventConnection.send">
+<tt class="descname">send</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/django_event/subscriber/connection.html#EventConnection.send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.subscriber.connection.EventConnection.send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends message to websocket.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>message</strong> (<tt class="xref py py-class docutils literal"><span class="pre">dict</span></tt>) &#8211; JSON decoded message routed by on_message method.</li>
+<li><strong>binary</strong> (<tt class="xref py py-class docutils literal"><span class="pre">bool</span></tt>) &#8211; Flag. True if message need to be send in binary.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.subscriber.connection.EventConnection.subscribe">
+<tt class="descname">subscribe</tt><big>(</big><em>message</em><big>)</big><a class="reference internal" href="_modules/django_event/subscriber/connection.html#EventConnection.subscribe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.subscriber.connection.EventConnection.subscribe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subscribes event listeners on messages.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>message</strong> (<tt class="xref py py-class docutils literal"><span class="pre">dict</span></tt>) &#8211; JSON decoded message routed by on_message method.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.subscriber.connection.EventConnection.unsubscribe">
+<tt class="descname">unsubscribe</tt><big>(</big><em>message</em><big>)</big><a class="reference internal" href="_modules/django_event/subscriber/connection.html#EventConnection.unsubscribe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.subscriber.connection.EventConnection.unsubscribe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unsubscribes event listeners from messages.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>message</strong> (<tt class="xref py py-class docutils literal"><span class="pre">dict</span></tt>) &#8211; JSON decoded message routed by on_message method.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.subscriber.connection.EventConnection.wrong_message">
+<tt class="descname">wrong_message</tt><big>(</big><em>message</em><big>)</big><a class="reference internal" href="_modules/django_event/subscriber/connection.html#EventConnection.wrong_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.subscriber.connection.EventConnection.wrong_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overridable method for wrong message type.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>message</strong> (<tt class="xref py py-class docutils literal"><span class="pre">dict</span></tt>) &#8211; JSON decoded message routed by on_message method.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-django_event.subscriber.listeners">
+<span id="django-event-subscriber-listeners"></span><h2>django_event.subscriber.listeners<a class="headerlink" href="#module-django_event.subscriber.listeners" title="Permalink to this headline">¶</a></h2>
+<p>Base listener module.</p>
+<dl class="class">
+<dt id="django_event.subscriber.listeners.Listener">
+<em class="property">class </em><tt class="descclassname">django_event.subscriber.listeners.</tt><tt class="descname">Listener</tt><big>(</big><em>user</em><big>)</big><a class="reference internal" href="_modules/django_event/subscriber/listeners.html#Listener"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.subscriber.listeners.Listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Abstract base listener class. Listeners used by subscribers.</p>
+<dl class="classmethod">
+<dt id="django_event.subscriber.listeners.Listener.get_listener">
+<em class="property">classmethod </em><tt class="descname">get_listener</tt><big>(</big><em>event_type</em><big>)</big><a class="reference internal" href="_modules/django_event/subscriber/listeners.html#Listener.get_listener"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.subscriber.listeners.Listener.get_listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fabric method for listener subclasses.
+Imports listener by type and returns it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event_type</strong> (<tt class="xref py py-class docutils literal"><span class="pre">str</span></tt>) &#8211; Event type.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Listener module that will process certain type of messages.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#django_event.subscriber.listeners.Listener" title="django_event.subscriber.listeners.Listener"><tt class="xref py py-class docutils literal"><span class="pre">Listener</span></tt></a> subclass</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.subscriber.listeners.Listener.on_message">
+<tt class="descname">on_message</tt><big>(</big><em>message</em><big>)</big><a class="reference internal" href="_modules/django_event/subscriber/listeners.html#Listener.on_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.subscriber.listeners.Listener.on_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract method. Specifies on message behaviour.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>message</strong> (<tt class="xref py py-class docutils literal"><span class="pre">str</span></tt>) &#8211; Received message.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raise:</th><td class="field-body">NotImplementedError</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.subscriber.listeners.Listener.routing_matched">
+<tt class="descname">routing_matched</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/django_event/subscriber/listeners.html#Listener.routing_matched"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.subscriber.listeners.Listener.routing_matched" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes routing key for current user and compares with received
+message&#8217;s routing key.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if routing key matched.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><tt class="xref py py-class docutils literal"><span class="pre">bool</span></tt></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="django_event.subscriber.listeners.SendMessageListener">
+<em class="property">class </em><tt class="descclassname">django_event.subscriber.listeners.</tt><tt class="descname">SendMessageListener</tt><big>(</big><em>user</em>, <em>sender</em><big>)</big><a class="reference internal" href="_modules/django_event/subscriber/listeners.html#SendMessageListener"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.subscriber.listeners.SendMessageListener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#django_event.subscriber.listeners.Listener" title="django_event.subscriber.listeners.Listener"><tt class="xref py py-class docutils literal"><span class="pre">django_event.subscriber.listeners.Listener</span></tt></a></p>
+<p>Base listener for send message through SockJS connection.</p>
+<dl class="method">
+<dt id="django_event.subscriber.listeners.SendMessageListener.on_message">
+<tt class="descname">on_message</tt><big>(</big><em>message</em><big>)</big><a class="reference internal" href="_modules/django_event/subscriber/listeners.html#SendMessageListener.on_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.subscriber.listeners.SendMessageListener.on_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends message if routing key matched.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>message</strong> (<tt class="xref py py-class docutils literal"><span class="pre">str</span></tt>) &#8211; Received message.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-django_event.subscriber.subscriber">
+<span id="django-event-subscriber-subscriber"></span><h2>django_event.subscriber.subscriber<a class="headerlink" href="#module-django_event.subscriber.subscriber" title="Permalink to this headline">¶</a></h2>
+<p>RabbitMQ subscribes module.
+Contains asynchronous publisher for tornado.</p>
+<dl class="class">
+<dt id="django_event.subscriber.subscriber.Subscriber">
+<em class="property">class </em><tt class="descclassname">django_event.subscriber.subscriber.</tt><tt class="descname">Subscriber</tt><big>(</big><em>queue_name=''</em>, <em>routing_key=''</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/django_event/subscriber/subscriber.html#Subscriber"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.subscriber.subscriber.Subscriber" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="django_event.rabbitmq.html#django_event.rabbitmq.client.RabbitMQClient" title="django_event.rabbitmq.client.RabbitMQClient"><tt class="xref py py-class docutils literal"><span class="pre">django_event.rabbitmq.client.RabbitMQClient</span></tt></a></p>
+<p>Base subscriber class. Asynchronous by default.</p>
+<dl class="method">
+<dt id="django_event.subscriber.subscriber.Subscriber.add_event_listener">
+<tt class="descname">add_event_listener</tt><big>(</big><em>listener</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/django_event/subscriber/subscriber.html#Subscriber.add_event_listener"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.subscriber.subscriber.Subscriber.add_event_listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds event listener for dispatch messages.
+Raises Exception if got listener of unexpected type.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>listener</strong> (<tt class="xref py py-class docutils literal"><span class="pre">str</span></tt> or <tt class="xref py py-class docutils literal"><span class="pre">Listener</span></tt> subclass or
+<tt class="xref py py-class docutils literal"><span class="pre">Listener</span></tt> instance) &#8211; Message listener</li>
+<li><strong>args</strong> &#8211; <tt class="xref py py-class docutils literal"><span class="pre">Listener</span></tt> init args</li>
+<li><strong>kwargs</strong> &#8211; <tt class="xref py py-class docutils literal"><span class="pre">Listener</span></tt> init kwargs</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raise:</th><td class="field-body"><p class="first last"><tt class="xref py py-class docutils literal"><span class="pre">TypeError</span></tt> if listeners of unknown type passed into.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.subscriber.subscriber.Subscriber.on_channel_open">
+<tt class="descname">on_channel_open</tt><big>(</big><em>channel</em><big>)</big><a class="reference internal" href="_modules/django_event/subscriber/subscriber.html#Subscriber.on_channel_open"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.subscriber.subscriber.Subscriber.on_channel_open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback on channel open. Overrides base method for setting callback.
+on_exchange_declared callback will be executed internally.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>channel</strong> (<tt class="xref py py-class docutils literal"><span class="pre">Channel</span></tt>) &#8211; Opened channel.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.subscriber.subscriber.Subscriber.on_exchange_declared">
+<tt class="descname">on_exchange_declared</tt><big>(</big><em>frame</em><big>)</big><a class="reference internal" href="_modules/django_event/subscriber/subscriber.html#Subscriber.on_exchange_declared"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.subscriber.subscriber.Subscriber.on_exchange_declared" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback on exchange declared. Declare queue.
+on_queue_declared callback will be executed internally.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>frame</strong> (<em>Frame</em>) &#8211; Frame instance.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.subscriber.subscriber.Subscriber.on_message">
+<tt class="descname">on_message</tt><big>(</big><em>channel</em>, <em>method</em>, <em>header</em>, <em>body</em><big>)</big><a class="reference internal" href="_modules/django_event/subscriber/subscriber.html#Subscriber.on_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.subscriber.subscriber.Subscriber.on_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback. Called internally. Notifies all listeners about consumed
+message. Called internally by on_queue_bind on message consumed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>channel</strong> (<tt class="xref py py-class docutils literal"><span class="pre">Channel</span></tt>) &#8211; Opened channel.</li>
+<li><strong>method</strong> (<em>Method</em>) &#8211; Method.</li>
+<li><strong>header</strong> (<tt class="xref py py-class docutils literal"><span class="pre">str</span></tt>) &#8211; Message&#8217;s headers.</li>
+<li><strong>body</strong> (<tt class="xref py py-class docutils literal"><span class="pre">str</span></tt>) &#8211; Consumed message&#8217;s body.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.subscriber.subscriber.Subscriber.on_queue_bind">
+<tt class="descname">on_queue_bind</tt><big>(</big><em>frame</em><big>)</big><a class="reference internal" href="_modules/django_event/subscriber/subscriber.html#Subscriber.on_queue_bind"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.subscriber.subscriber.Subscriber.on_queue_bind" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback on queue binded. Starts consume messages.
+on_message callback will be executed internally.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>frame</strong> (<em>Frame</em>) &#8211; Frame instance.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.subscriber.subscriber.Subscriber.on_queue_declared">
+<tt class="descname">on_queue_declared</tt><big>(</big><em>frame</em><big>)</big><a class="reference internal" href="_modules/django_event/subscriber/subscriber.html#Subscriber.on_queue_declared"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.subscriber.subscriber.Subscriber.on_queue_declared" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback on queue declared. Bind queue.
+on_queue_bind callback will be executed internally.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>frame</strong> (<em>Frame</em>) &#8211; Frame instance.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_event.subscriber.subscriber.Subscriber.remove_event_listener">
+<tt class="descname">remove_event_listener</tt><big>(</big><em>listener</em><big>)</big><a class="reference internal" href="_modules/django_event/subscriber/subscriber.html#Subscriber.remove_event_listener"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.subscriber.subscriber.Subscriber.remove_event_listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove event listener.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>listener</strong> (<tt class="xref py py-class docutils literal"><span class="pre">str</span></tt> or <tt class="xref py py-class docutils literal"><span class="pre">Listener</span></tt> subclass or
+<tt class="xref py py-class docutils literal"><span class="pre">Listener</span></tt> instance) &#8211; Message listener</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raise:</th><td class="field-body"><tt class="xref py py-class docutils literal"><span class="pre">KeyError</span></tt> if listener not found.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="django_event.rabbitmq.html" class="btn btn-neutral" title="django_event.rabbitmq"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014, Dmitry Panchenko.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.3.2',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

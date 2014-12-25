@@ -1,0 +1,207 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>django_event.management.commands &mdash; django_event 0.3.2 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="django_event 0.3.2 documentation" href="index.html"/>
+        <link rel="up" title="django_event.management" href="django_event.management.html"/>
+        <link rel="next" title="django_event.publisher" href="django_event.publisher.html"/>
+        <link rel="prev" title="django_event.management" href="django_event.management.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="fa fa-home"> django_event</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="django_event.html">django_event</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="django_event.management.html">django_event.management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="django_event.publisher.html">django_event.publisher</a></li>
+<li class="toctree-l2"><a class="reference internal" href="django_event.rabbitmq.html">django_event.rabbitmq</a></li>
+<li class="toctree-l2"><a class="reference internal" href="django_event.subscriber.html">django_event.subscriber</a></li>
+<li class="toctree-l2"><a class="reference internal" href="django_event.html#module-django_event.utils">django_event.utils</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">django_event</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="django_event.html">django_event</a> &raquo;</li>
+      
+          <li><a href="django_event.management.html">django_event.management</a> &raquo;</li>
+      
+    <li>django_event.management.commands</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/django_event.management.commands.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <div class="section" id="django-event-management-commands">
+<h1>django_event.management.commands<a class="headerlink" href="#django-event-management-commands" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-django_event.management.commands.deleteoldevents">
+<span id="django-event-management-commands-deleteoldevents"></span><h2>django_event.management.commands.deleteoldevents<a class="headerlink" href="#module-django_event.management.commands.deleteoldevents" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="django_event.management.commands.deleteoldevents.Command">
+<em class="property">class </em><tt class="descclassname">django_event.management.commands.deleteoldevents.</tt><tt class="descname">Command</tt><a class="reference internal" href="_modules/django_event/management/commands/deleteoldevents.html#Command"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.management.commands.deleteoldevents.Command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.core.management.base.NoArgsCommand</span></tt></p>
+<p>Django command to delete old events.</p>
+<dl class="method">
+<dt id="django_event.management.commands.deleteoldevents.Command.handle_noargs">
+<tt class="descname">handle_noargs</tt><big>(</big><em>**options</em><big>)</big><a class="reference internal" href="_modules/django_event/management/commands/deleteoldevents.html#Command.handle_noargs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.management.commands.deleteoldevents.Command.handle_noargs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-django_event.management.commands.runwebsocketserver">
+<span id="django-event-management-commands-runwebsocketserver"></span><h2>django_event.management.commands.runwebsocketserver<a class="headerlink" href="#module-django_event.management.commands.runwebsocketserver" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="django_event.management.commands.runwebsocketserver.Command">
+<em class="property">class </em><tt class="descclassname">django_event.management.commands.runwebsocketserver.</tt><tt class="descname">Command</tt><a class="reference internal" href="_modules/django_event/management/commands/runwebsocketserver.html#Command"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.management.commands.runwebsocketserver.Command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.core.management.base.BaseCommand</span></tt></p>
+<p>Django command to start tornado server.</p>
+<dl class="method">
+<dt id="django_event.management.commands.runwebsocketserver.Command.handle">
+<tt class="descname">handle</tt><big>(</big><em>*args</em>, <em>**options</em><big>)</big><a class="reference internal" href="_modules/django_event/management/commands/runwebsocketserver.html#Command.handle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_event.management.commands.runwebsocketserver.Command.handle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="django_event.publisher.html" class="btn btn-neutral float-right" title="django_event.publisher"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="django_event.management.html" class="btn btn-neutral" title="django_event.management"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014, Dmitry Panchenko.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.3.2',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
