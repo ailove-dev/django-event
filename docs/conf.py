@@ -15,7 +15,6 @@
 import sys
 import os
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(os.path.join(os.path.dirname(__file__)))
 os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 from django_event import version, release_tag
@@ -23,12 +22,13 @@ from django_event import version, release_tag
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.insert(0, os.path.abspath('..'))
+# sys.path.insert(0, os.path.abspath('..'))
 
 try:
     from unittest.mock import MagickMock
-except:
+except ImportError:
     from mock import Mock as MagickMock
+
 
 class Mock(MagickMock):
     @classmethod
@@ -36,7 +36,7 @@ class Mock(MagickMock):
         return Mock()
 
     def __setattr__(self, name, value):
-	self.__dict__[name] = value
+        self.__dict__[name] = value
 
 MOCK_MODULES = [
     'kombu', 
@@ -210,22 +210,22 @@ htmlhelp_basename = 'django_event'
 # -- Options for LaTeX output ---------------------------------------------
 
 latex_elements = {
-# The paper size ('letterpaper' or 'a4paper').
-#'papersize': 'letterpaper',
+    # The paper size ('letterpaper' or 'a4paper').
+    #'papersize': 'letterpaper',
 
-# The font size ('10pt', '11pt' or '12pt').
-#'pointsize': '10pt',
+    # The font size ('10pt', '11pt' or '12pt').
+    #'pointsize': '10pt',
 
-# Additional stuff for the LaTeX preamble.
-#'preamble': '',
+    # Additional stuff for the LaTeX preamble.
+    #'preamble': '',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'django_event.tex', u'django_event Documentation',
-   u'Dmitry Panchenko', 'manual'),
+    ('index', 'django_event.tex', u'django_event Documentation',
+     u'Dmitry Panchenko', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -268,9 +268,9 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'django_event', u'django_event Documentation',
-   u'Dmitry Panchenko', 'django_event', 'One line description of project.',
-   'Miscellaneous'),
+    ('index', 'django_event', u'django_event Documentation',
+     u'Dmitry Panchenko', 'django_event', 'One line description of project.',
+     'Miscellaneous'),
 ]
 
 # Documents to append as an appendix to all manuals.
@@ -291,5 +291,3 @@ if not on_rtd:
     import sphinx_rtd_theme
     html_theme = 'sphinx_rtd_theme'
     html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
-
-

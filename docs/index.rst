@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Welcome to django_event's documentation!
-===============================================
+========================================
 
 Django Event is notification system framework that allows you to push notifications to the browser.
 

@@ -17,9 +17,9 @@ django_event.subscriber.connection
     :show-inheritance:
 
     .. attribute:: executor
-	:annotation: = ThreadPoolExecutor(max_workers=cpu_count())
+    :annotation: = ThreadPoolExecutor(max_workers=cpu_count())
 
-    	Thread pool for synchronous methods
+        Thread pool for synchronous methods
 
 django_event.subscriber.listeners
 ---------------------------------

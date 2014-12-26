@@ -1,8 +1,8 @@
 django_event.publisher.rest_framework
 =====================================
 
-django_event.publisher.serializers
-----------------------------------
+django_event.publisher.rest_framework.serializers
+-------------------------------------------------
 
 .. automodule:: django_event.publisher.rest_framework.serializers
     :members:
@@ -28,16 +28,16 @@ django_event.publisher.serializers
     :undoc-members:
     :show-inheritance:
 
-django_event.publisher.urls
----------------------------
+django_event.publisher.rest_framework.urls
+------------------------------------------
 
 .. automodule:: django_event.publisher.rest_framework.urls
     :members:
     :undoc-members:
     :show-inheritance:
 
-django_event.publisher.views
------------------------------------
+django_event.publisher.rest_framework.views
+-------------------------------------------
 
 .. automodule:: django_event.publisher.rest_framework.views
     :members:
