@@ -34,5 +34,5 @@ Documentation
 
     For docs we use Read The Docs and you can find our docs `here`_.
     
-.. _`here`: https://readthedocs.org
+.. _`here`: https://django-event.readthedocs.org/
     
