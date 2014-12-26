@@ -21,12 +21,12 @@ if sys.version < '3':
 
 
 extras = {
-    'rest_framework_api': ['djangorestframework>=2.3.14',]
+    'rest_framework': ['djangorestframework>=2.3.14',]
 }
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 if on_rtd:
-    for _, extra_requirments in extras.iteritems():
+    for extra_requirments in extras.itervalues():
         requirments.extend(extra_requirments)
 
 
@@ -53,7 +53,6 @@ setup_options = dict(
         'Programming Language :: Python :: 3',
         'Topic :: Utilities',
     ],
-    extras_require=extras,
 )
 
 setup(**setup_options)
