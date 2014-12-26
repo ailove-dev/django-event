@@ -1,10 +1,6 @@
 README
 ======
 
-.. image:: https://readthedocs.org/projects/django-event/badge/?version=latest
-    :target: https://readthedocs.org/projects/django-event/?badge=latest
-    :alt: Documentation Status
-
 
 About
 -----
