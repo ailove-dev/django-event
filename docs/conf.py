@@ -18,13 +18,31 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(os.path.join(os.path.dirname(__file__)))
 os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
-from django.conf import settings
 from django_event import version, release_tag
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.insert(0, os.path.abspath('..'))
+
+try:
+    from unittest.mock import MagickMock
+except:
+    from mock import Mock as MagickMock
+
+class Mock(MagickMock):
+    @classmethod
+    def __getattr__(cls, name):
+        return Mock()
+
+    def __setattr__(self, name, value):
+	self.__dict__[name] = value
+
+MOCK_MODULES = [
+    'kombu', 
+    'celery',
+]
+sys.modules.update((mod_name, Mock(mod_name)) for mod_name in MOCK_MODULES)
 
 # -- General configuration ------------------------------------------------
 
@@ -273,4 +291,5 @@ if not on_rtd:
     import sphinx_rtd_theme
     html_theme = 'sphinx_rtd_theme'
     html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+
 

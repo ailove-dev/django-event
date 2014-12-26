@@ -1,6 +1,7 @@
-from distutils.core import setup
+from setuptools import setup, find_packages
 
 import sys
+import os
 
 from django_event import version, release_tag
 
@@ -23,6 +24,12 @@ extras = {
     'rest_framework_api': ['djangorestframework>=2.3.14',]
 }
 
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+if on_rtd:
+    for _, extra_requirments in extras.iteritems():
+        requirments.extend(extra_requirments)
+
+
 setup_options = dict(
     name='django-event',
     version='%s-%s' % (version, release_tag) if release_tag else version,
@@ -31,7 +38,7 @@ setup_options = dict(
     author='Dmitry Panchenko',
     author_email='d.panchenko@ailove.com',
     description='Event notification system for django project',
-    packages=['django_event'],
+    packages=find_packages(),
     zip_safe=False,
     include_package_data=True,
     platforms='any',

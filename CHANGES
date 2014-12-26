@@ -8,3 +8,5 @@
 0.4.0-beta (2014-12-25)
     Added rest_framework package. All dependand api views moved into.
     Added classic django views for event API's.
+0.4.1 (2014-12-26)
+    Created framework settings module.

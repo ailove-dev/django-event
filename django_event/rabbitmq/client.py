@@ -6,11 +6,11 @@ You basically don't need to use this module.
 """
 
 
-from django.conf import settings
 from pika import ConnectionParameters
 from pika import PlainCredentials
 from pika.adapters import TornadoConnection
 
+from .. import settings
 
 class RabbitMQClient(object):
     """

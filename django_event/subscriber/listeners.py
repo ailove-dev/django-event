@@ -7,7 +7,7 @@ Base listener module.
 
 import json
 
-from django.conf import settings
+from .. import settings
 
 from ..utils import get_routing
 from ..utils import import_var
@@ -43,7 +43,7 @@ class Listener(object):
         :rtype: :class:`Listener` subclass
         """
 
-        return import_var(settings.EVENT_LISTENER_CLASSES[event_type])
+        return import_var(settings.LISTENER_CLASSES[event_type])
 
     def on_message(self, message):
         """

@@ -10,7 +10,7 @@ You must handle old events by yourself using cron or celery worker.
 from datetime import timedelta
 
 import celery
-from django.conf import settings
+from django.conf import settings as app_settings
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
@@ -18,7 +18,7 @@ from django.utils import timezone
 from .publisher import BlockingPublisher
 from .request import EventRequest
 from ..utils import get_routing
-
+from .. import settings
 
 class EventQuerySet(models.QuerySet):
     """
@@ -54,7 +54,7 @@ class EventQuerySet(models.QuerySet):
         :rtype: :class:`EventQuerySet`
         """
 
-        storing_days = getattr(settings, 'EVENT_STORE_DAYS', 7)
+        storing_days = settings.STORE_DAY
         return self.filter(
             completed_at__lte=timezone.now() - timedelta(days=storing_days)
         )
@@ -123,7 +123,7 @@ class Event(models.Model):
 
     objects = EventQuerySet.as_manager()
 
-    user = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', User))
+    user = models.ForeignKey(getattr(app_settings, 'AUTH_USER_MODEL', User))
     type = models.CharField(max_length=30)
     send_mail = models.BooleanField(default=False)
 

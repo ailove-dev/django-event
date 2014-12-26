@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from django.conf import settings
 from django.core.management.base import BaseCommand
 from sockjs.tornado import SockJSRouter
 from tornado.web import Application
 from tornado.ioloop import IOLoop
 
 from ...subscriber.connection import EventConnection
-
+from ... import settings
 
 class Command(BaseCommand):
     """
@@ -15,8 +14,8 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        host = getattr(settings, 'EVENT_HOST', '/')
-        port = getattr(settings, 'EVENT_PORT', 8989)
+        host = settings.HOST
+        port = settings.PORT
 
         router = SockJSRouter(EventConnection, host)
         app = Application(router.urls)
