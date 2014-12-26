@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-from decorator import event
+from django_event.publisher.decorator import event

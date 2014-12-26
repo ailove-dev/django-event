@@ -26,15 +26,13 @@ You can know more about .delay() or other methods in Celery docs.
 
 __all__ = ['event']
 
-
 from functools import wraps
 
 from celery import task
 from celery import current_task
 from django.contrib.auth import get_user_model
 
-from .exceptions import EventError
-from .models import Event
+from django_event.publisher.exceptions import EventError
 
 
 class event(object):
@@ -123,6 +121,8 @@ class event(object):
         Create event model with passing arguments.
         Basically you dont need to manually create event.
         """
+
+        from django_event.models import Event
 
         self._event = Event.create(
             progress_throttling=self._progress_throttling,

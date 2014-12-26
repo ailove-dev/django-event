@@ -14,7 +14,7 @@ from pika import ConnectionParameters
 from pika import PlainCredentials
 from pika.adapters import BlockingConnection
 
-from ..rabbitmq.client import RabbitMQClient
+from django_event.rabbitmq.client import RabbitMQClient
 
 
 class Publisher(RabbitMQClient):

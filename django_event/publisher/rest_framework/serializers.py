@@ -7,7 +7,7 @@ Serializers module for django rest_framework.
 from django.utils import timezone
 from rest_framework import serializers
 
-from ..models import Event
+from django_event.models import Event
 
 
 class LocalDateTimeField(serializers.DateTimeField):

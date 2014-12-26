@@ -17,8 +17,8 @@ from sockjs.tornado.conn import SockJSConnection
 from tornado import gen
 from tornado.concurrent import run_on_executor
 
-from .subscriber import Subscriber
-from .listeners import Listener
+from django_event.subscriber.subscriber import Subscriber
+from django_event.subscriber.listeners import Listener
 
 
 _engine = import_module(settings.SESSION_ENGINE)

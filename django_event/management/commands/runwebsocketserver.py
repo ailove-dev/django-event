@@ -5,8 +5,9 @@ from sockjs.tornado import SockJSRouter
 from tornado.web import Application
 from tornado.ioloop import IOLoop
 
-from ...subscriber.connection import EventConnection
-from ... import settings
+from django_event import settings
+from django_event.subscriber.connection import EventConnection
+
 
 class Command(BaseCommand):
     """

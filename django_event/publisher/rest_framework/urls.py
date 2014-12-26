@@ -31,7 +31,11 @@ Urls for django. ::
 
 
 from django.conf.urls import patterns, url
-from .views import event_list, event_detail, cancel_event, retry_event
+
+from django_event.publisher.rest_framework.views import event_list
+from django_event.publisher.rest_framework.views import event_detail
+from django_event.publisher.rest_framework.views import cancel_event
+from django_event.publisher.rest_framework.views import retry_event
 
 
 urlpatterns = patterns(

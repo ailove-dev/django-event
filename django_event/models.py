@@ -15,10 +15,11 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 
-from .publisher import BlockingPublisher
-from .request import EventRequest
-from ..utils import get_routing
-from .. import settings
+from django_event import settings
+from django_event.utils import get_routing
+from django_event.publisher.publisher import BlockingPublisher
+from django_event.publisher.request import EventRequest
+
 
 class EventQuerySet(models.QuerySet):
     """

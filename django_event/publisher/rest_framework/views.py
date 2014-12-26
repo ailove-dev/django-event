@@ -13,8 +13,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .serializers import EventSerializer
-from ..models import Event
+from django_event.models import Event
+from django_event.publisher.rest_framework.serializers import EventSerializer
 
 
 class EventListView(ListAPIView):

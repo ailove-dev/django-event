@@ -7,10 +7,9 @@ Base listener module.
 
 import json
 
-from .. import settings
-
-from ..utils import get_routing
-from ..utils import import_var
+from django_event import settings
+from django_event.utils import get_routing
+from django_event.utils import import_var
 
 
 class Listener(object):

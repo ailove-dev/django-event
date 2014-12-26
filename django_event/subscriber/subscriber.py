@@ -8,9 +8,9 @@ Contains asynchronous publisher for tornado.
 
 import types
 
-from .listeners import Listener
-from ..rabbitmq.client import RabbitMQClient
-from ..utils import import_var
+from django_event.utils import import_var
+from django_event.subscriber.listeners import Listener
+from django_event.rabbitmq.client import RabbitMQClient
 
 
 class Subscriber(RabbitMQClient):

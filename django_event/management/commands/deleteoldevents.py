@@ -2,7 +2,7 @@
 
 from django.core.management.base import NoArgsCommand
 
-from ...publisher.models import Event
+from django_event.models import Event
 
 
 class Command(NoArgsCommand):

@@ -10,7 +10,8 @@ from pika import ConnectionParameters
 from pika import PlainCredentials
 from pika.adapters import TornadoConnection
 
-from .. import settings
+from django_event import settings
+
 
 class RabbitMQClient(object):
     """

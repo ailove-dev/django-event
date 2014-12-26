@@ -9,7 +9,7 @@ from django.views.generic.base import View
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 
-from .models import Event
+from django_event.models import Event
 
 
 class LoginRequiredMixin(object):
