@@ -1,9 +1,13 @@
 README
 ======
 
+.. image:: https://readthedocs.org/projects/django-event/badge/?version=latest
+    :target: https://readthedocs.org/projects/django-event/?badge=latest
+    :alt: Documentation Status
 
-README
-------
+
+About
+-----
 
 Django Event is notification system framework that allows you to push notifications to the browser.
 
@@ -32,7 +36,7 @@ If you use Django Rest Framework and want to django-event provided REST api's fo
 Documentation
 ~~~~~~~~~~~~~
 
-    For docs we use Read The Docs and you can find our docs `here`_.
+For docs we use Read The Docs and you can find our docs `here`_.
     
 .. _`here`: https://django-event.readthedocs.org/
     
