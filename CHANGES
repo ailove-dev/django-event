@@ -10,3 +10,5 @@
     Added classic django views for event API's.
 0.4.1 (2014-12-26)
     Created framework settings module.
+0.4.2 (2014-12-26)
+    Add default urls for classic django views.

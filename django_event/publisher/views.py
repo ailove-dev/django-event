@@ -53,11 +53,14 @@ class EventListMixin(object):
         return get_list_or_404(self.model, user=self.request.user)
 
 
-class EventListBaseView(LoginRequiredMixin,
-                        EventListMixin, ListView):
+class EventListView(LoginRequiredMixin,
+                    EventListMixin, ListView):
     """
     Base event list view class.
     """
+
+event_list = EventListView.as_view()
+
 
 class EventDetailMixin(EventListMixin):
     """
@@ -75,15 +78,17 @@ class EventDetailMixin(EventListMixin):
         return get_object_or_404(self.get_queryset(), pk=pk)
 
 
-class EventDetailBaseView(LoginRequiredMixin,
-                          EventDetailMixin, DetailView):
+class EventDetailView(LoginRequiredMixin,
+                      EventDetailMixin, DetailView):
     """
     Base event detail view class.
     """
 
+event_detail = EventDetailView.as_view()
 
-class CancelEventBaseView(LoginRequiredMixin,
-                          EventDetailMixin, View):
+
+class CancelEventView(LoginRequiredMixin,
+                      EventDetailMixin, View):
     """
     Base cancel event view class.
     """
@@ -108,9 +113,11 @@ class CancelEventBaseView(LoginRequiredMixin,
     def post(self, request, pk):
         return HttpResponse(self.cancel(pk))
 
+cancel_event = CancelEventView.as_view()
 
-class RetryEventBaseView(LoginRequiredMixin,
-                         EventDetailMixin, View):
+
+class RetryEventView(LoginRequiredMixin,
+                     EventDetailMixin, View):
     """
     Base retry event view class.
     """
@@ -132,3 +139,5 @@ class RetryEventBaseView(LoginRequiredMixin,
 
     def post(self, request, pk):
         return HttpResponse(self.retry(pk))
+
+retry_event = RetryEventView.as_view()
