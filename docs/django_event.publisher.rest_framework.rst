@@ -6,7 +6,25 @@ django_event.publisher.serializers
 
 .. automodule:: django_event.publisher.rest_framework.serializers
     :members:
-    :exclude-members: base_fields
+    :exclude-members: EventSerializer, LocalDateTimeField
+    :undoc-members:
+    :show-inheritance:
+
+.. autoclass:: EventSerializer(instance=None, data=None, files=None, context=None, partial=False, many=None, allow_add_remove=False, **kwargs)
+    :members:
+    :show-inheritance:
+    
+    .. class:: Meta
+        
+        .. attribute:: model
+        
+            alias of :class:`Event`
+            
+        .. attribute:: exclude
+            :annotation: = ('event_request', 'task_name', 'task_id')
+    
+.. autoclass:: LocalDateTimeField(input_formats=None, format=None, *args, **kwargs)
+    :members:
     :undoc-members:
     :show-inheritance:
 
