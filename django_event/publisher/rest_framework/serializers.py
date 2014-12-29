@@ -40,4 +40,3 @@ class EventSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Event
-        exclude = ('event_request', 'task_name', 'task_id')
