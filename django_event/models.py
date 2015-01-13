@@ -8,6 +8,7 @@ You must handle old events by yourself using cron or celery worker.
 
 
 from datetime import timedelta
+import threading
 
 import celery
 from django.conf import settings as app_settings
@@ -162,6 +163,7 @@ class Event(models.Model):
         self._progress_throttling = None
         self._routing_strategy = None
         self._routing_key = None
+        self._lock = threading.Lock()
 
     @classmethod
     def create(cls,
@@ -341,12 +343,13 @@ class Event(models.Model):
         :type custom_message: JSON serializable object.
         """
 
-        if self._progress + progress_delta > 100.0:
-            self._progress = 99.9
-        else:
-            self._progress += progress_delta
-        if progress_delta >= self._progress_throttling:
-            self.on_progress_change(custom_message)
+        with self._lock:
+            if self._progress + progress_delta > 100.0:
+                self._progress = 99.9
+            else:
+                self._progress += progress_delta
+            if progress_delta >= self._progress_throttling:
+                self.on_progress_change(custom_message)
 
     def retry(self, custom_message=None, request=None, **kwargs):
         """
