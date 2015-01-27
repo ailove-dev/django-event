@@ -120,8 +120,8 @@ class Event(models.Model):
     """
 
     class Meta:
-        verbose_name = 'Event'
-        verbose_name_plural = 'Events'
+        verbose_name = u'Event'
+        verbose_name_plural = u'Events'
 
     objects = EventQuerySet.as_manager()
 
@@ -164,6 +164,9 @@ class Event(models.Model):
         self._routing_strategy = None
         self._routing_key = None
         self._lock = threading.Lock()
+
+    def __unicode__(self):
+        return u"Event %s %s" % (self.id, self.type)
 
     @classmethod
     def create(cls,

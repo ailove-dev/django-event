@@ -12,3 +12,5 @@
     Created framework settings module.
 0.4.2 (2014-12-26)
     Add default urls for classic django views.
+0.4.3 (2015-01-27)
+    Add admin models.
