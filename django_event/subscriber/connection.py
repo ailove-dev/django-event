@@ -133,7 +133,7 @@ class EventConnection(SockJSConnection):
         message = json.loads(message)
         message_type = message.get('type')
 
-        yield actions.get(message_type, self.wrong_message)(message)
+        actions.get(message_type, self.wrong_message)(message)
 
     def subscribe(self, message):
         """
@@ -204,5 +204,5 @@ class EventConnection(SockJSConnection):
         Unsubscribes all event listeners.
         """
 
-        for subscriber in self.subscribers:
+        for _, subscriber in self.subscribers.iteritems():
             subscriber.disconnect()
