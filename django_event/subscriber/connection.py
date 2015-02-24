@@ -10,8 +10,10 @@ import json
 from multiprocessing import cpu_count
 
 from concurrent.futures import ThreadPoolExecutor
+from django import db
 from django.conf import settings
 from django.contrib.auth import get_user as _get_user
+from django.contrib.sessions.exceptions import InvalidSessionKey
 from django.utils.importlib import import_module
 from sockjs.tornado.conn import SockJSConnection
 from tornado import gen
@@ -94,7 +96,10 @@ class EventConnection(SockJSConnection):
         :type request: Tornado Request
         """
 
-        self.user = yield self.authenticate(request)
+        try:
+            self.user = yield self.authenticate(request)
+        except (db.Error, InvalidSessionKey):
+            self.close()
 
     @run_on_executor
     def authenticate(self, request):
@@ -108,8 +113,13 @@ class EventConnection(SockJSConnection):
         :rtype: Django User
         """
 
-        return get_user(
-            get_session(request.get_cookie('sessionid').value))
+        user = get_user(get_session(request.get_cookie('sessionid').value))
+
+        if not user:
+            raise InvalidSessionKey('Session id was not provided')
+
+        return user
+
 
     @gen.coroutine
     def on_message(self, message):

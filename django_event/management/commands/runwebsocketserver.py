@@ -21,4 +21,8 @@ class Command(BaseCommand):
         router = SockJSRouter(EventConnection, host)
         app = Application(router.urls)
         app.listen(port)
-        IOLoop.instance().start()
+
+        try:
+            IOLoop.instance().start()
+        except KeyboardInterrupt:
+            pass

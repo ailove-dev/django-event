@@ -14,3 +14,6 @@
     Add default urls for classic django views.
 0.4.3 (2015-01-27)
     Add admin models.
+0.4.4 (2015-02-24)
+    Fixed ^C'ing run command.
+    Fixed session handling.
