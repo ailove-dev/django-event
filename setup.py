@@ -21,7 +21,7 @@ if sys.version < '3':
 
 
 extras = {
-    'rest_framework': ['djangorestframework>=3.1.1',]
+    'rest_framework': ['djangorestframework>=3.1.1', ]
 }
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
