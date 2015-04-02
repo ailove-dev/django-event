@@ -15,16 +15,15 @@ class LocalDateTimeField(serializers.DateTimeField):
     Automatically converts server time into local time.
     """
 
-    def to_native(self, value):
+    def to_representation(self, value):
         """
         Converts UTC to local time.
 
         :param value: UTC datetime from db.
         :type value: :class:`DateTime`
         """
-
-        return super(LocalDateTimeField, self).to_native(
-            value if not value else timezone.localtime(value)
+        return super(LocalDateTimeField, self).to_representation(
+            value if value is None else timezone.localtime(value)
         )
 
 

@@ -11,4 +11,4 @@ pika==0.9.14
 futures==2.2.0
 
 # Optional packages
-djangorestframework==2.3.14
+djangorestframework==3.1.1

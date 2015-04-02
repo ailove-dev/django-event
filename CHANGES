@@ -17,3 +17,5 @@
 0.4.4 (2015-02-24)
     Fixed ^C'ing run command.
     Fixed session handling.
+0.4.5 (2015-04-02)
+    Add support DRF 3.X

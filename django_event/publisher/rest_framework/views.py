@@ -5,11 +5,13 @@ Synchronous views for django to get/cancel or retry events.
 """
 
 
+from django.http.response import Http404
 from django.db.models import ObjectDoesNotExist
 from rest_framework import status
 from rest_framework.filters import OrderingFilter
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -22,7 +24,7 @@ class EventListView(ListAPIView):
     List all user events.
     """
 
-    model = Event
+    queryset = Event.objects.all()
     serializer_class = EventSerializer
     filter_backends = (OrderingFilter, )
     max_paginate_by = 50
@@ -53,7 +55,7 @@ class EventDetailView(APIView):
     Retrieve specific user event.
     """
 
-    model = Event
+    queryset = Event.objects.all()
     serializer_class = EventSerializer
     permission_classes = (IsAuthenticated, )
 
@@ -69,9 +71,9 @@ class EventDetailView(APIView):
             if event.user == request.user:
                 serializer = self.serializer_class(event)
                 return Response(serializer.data)
-            return Response(status.HTTP_403_FORBIDDEN)
+            raise PermissionDenied()
         except ObjectDoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            raise Http404()
 
 event_detail = EventDetailView.as_view()
 
@@ -103,9 +105,9 @@ class CancelEventView(APIView):
             if event.user == request.user and event.may_be_canceled:
                 event.cancel()
                 return Response(status=status.HTTP_200_OK)
-            return Response(status=status.HTTP_403_FORBIDDEN)
+            raise PermissionDenied()
         except ObjectDoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            raise Http404()
 
 cancel_event = CancelEventView.as_view()
 
@@ -138,8 +140,8 @@ class RetryEventView(APIView):
                 return Response({
                     'retried_id': event.retry()
                 }, status=status.HTTP_200_OK)
-            return Response(status=status.HTTP_403_FORBIDDEN)
+            raise PermissionDenied()
         except ObjectDoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            raise Http404()
 
 retry_event = RetryEventView.as_view()

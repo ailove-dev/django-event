@@ -16,12 +16,12 @@ requirments = [
 
 if sys.version < '3':
     requirments.extend([
-        'futures>=2.2.0' # 2.7 backport of concurrent package
+        'futures>=2.2.0'  # 2.7 backport of concurrent package
     ])
 
 
 extras = {
-    'rest_framework': ['djangorestframework>=2.3.14',]
+    'rest_framework': ['djangorestframework>=3.1.1',]
 }
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
