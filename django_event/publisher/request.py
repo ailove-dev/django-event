@@ -49,7 +49,7 @@ class _DummyRequest:
         :type user: :class:`User` or :class:`_DummyUser`
         """
 
-        self.DATA = data
+        self.data = data
         self.user = user
 
 
@@ -68,7 +68,7 @@ class EventRequest(object):
         :param kwargs: Custom arguments needed by task.
         """
 
-        self.data = django_request.DATA
+        self.data = django_request.data
         self.user_id = django_request.user.id
         self.send_mail = self.data.pop('send_mail', True)
         self.custom_args = kwargs

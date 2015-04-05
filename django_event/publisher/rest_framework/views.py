@@ -5,13 +5,12 @@ Synchronous views for django to get/cancel or retry events.
 """
 
 
-from django.http.response import Http404
 from django.db.models import ObjectDoesNotExist
 from rest_framework import status
 from rest_framework.filters import OrderingFilter
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, NotFound
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -73,7 +72,7 @@ class EventDetailView(APIView):
                 return Response(serializer.data)
             raise PermissionDenied()
         except ObjectDoesNotExist:
-            raise Http404()
+            raise NotFound()
 
 event_detail = EventDetailView.as_view()
 
@@ -107,7 +106,7 @@ class CancelEventView(APIView):
                 return Response(status=status.HTTP_200_OK)
             raise PermissionDenied()
         except ObjectDoesNotExist:
-            raise Http404()
+            raise NotFound()
 
 cancel_event = CancelEventView.as_view()
 
@@ -142,6 +141,6 @@ class RetryEventView(APIView):
                 }, status=status.HTTP_200_OK)
             raise PermissionDenied()
         except ObjectDoesNotExist:
-            raise Http404()
+            raise NotFound()
 
 retry_event = RetryEventView.as_view()
