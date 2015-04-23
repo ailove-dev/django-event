@@ -120,7 +120,6 @@ class EventConnection(SockJSConnection):
 
         return user
 
-
     @gen.coroutine
     def on_message(self, message):
         """
