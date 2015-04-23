@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
 
-version = "0.5.0"
-release_tag = ""
+from __future__ import unicode_literals
+
+
+__version__ = "0.5.0"
+__release_tag__ = ""

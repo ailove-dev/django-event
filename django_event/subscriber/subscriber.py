@@ -6,6 +6,8 @@ Contains asynchronous publisher for tornado.
 """
 
 
+from __future__ import unicode_literals
+
 import types
 
 from django_event.utils import import_var

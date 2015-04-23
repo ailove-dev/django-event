@@ -4,6 +4,8 @@
 Serializers module for django rest_framework.
 """
 
+from __future__ import unicode_literals
+
 from django.utils import timezone
 from rest_framework import serializers
 

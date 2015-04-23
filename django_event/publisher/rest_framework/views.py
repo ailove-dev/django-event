@@ -5,6 +5,8 @@ Synchronous views for django to get/cancel or retry events.
 """
 
 
+from __future__ import unicode_literals
+
 from django.http.response import Http404
 from django.db.models import ObjectDoesNotExist
 from rest_framework import status

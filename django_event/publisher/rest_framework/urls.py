@@ -30,6 +30,8 @@ Urls for django. ::
 """
 
 
+from __future__ import unicode_literals
+
 from django.conf.urls import patterns, url
 
 from django_event.publisher.rest_framework.views import event_list

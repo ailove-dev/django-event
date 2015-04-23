@@ -1,9 +1,14 @@
-from setuptools import setup, find_packages
+# -*- coding: utf-8 -*-
 
-import sys
+from __future__ import unicode_literals
+
 import os
+import sys
+from setuptools import setup
+from setuptools import find_packages
 
-from django_event import version, release_tag
+from django_event import __version__
+from django_event import __release_tag__
 
 
 requirments = [
@@ -11,7 +16,6 @@ requirments = [
     'celery>=3.1.16',
     'tornado>=4.0.2',
     'sockjs-tornado>=1.0.1',
-    'pika>=0.9.14',
 ]
 
 if sys.version < '3':
@@ -21,18 +25,21 @@ if sys.version < '3':
 
 
 extras = {
-    'rest_framework': ['djangorestframework>=3.1.1', ]
+    'rest_framework': ['djangorestframework>=3.1.1', ],
+    'rabbit_mq': ['pika>=0.9.14', ],
 }
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 if on_rtd:
-    for extra_requirments in extras.itervalues():
-        requirments.extend(extra_requirments)
+    for extra_requirements in extras.itervalues():
+        requirments.extend(extra_requirements)
 
 
 setup_options = dict(
     name='django-event',
-    version='%s-%s' % (version, release_tag) if release_tag else version,
+    version='%s-%s' % (
+        __version__, __release_tag__
+    ) if __release_tag__ else __version__,
     url='https://github.com/ailove-dev/django-event',
     license='MIT',
     author='Dmitry Panchenko',

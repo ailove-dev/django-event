@@ -5,6 +5,8 @@ Utilities event module.
 """
 
 
+from __future__ import unicode_literals
+
 import importlib
 
 
@@ -59,3 +61,10 @@ def get_routing(user, routing_strategy):
     for route in routing:
         source = getattr(source, route)
     return str(source)
+
+
+def try_import_or_runtime_error(module, message):
+    try:
+        __import__(module)
+    except ImportError:
+        raise RuntimeError(message)

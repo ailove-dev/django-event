@@ -24,7 +24,7 @@ You can know more about .delay() or other methods in Celery docs.
 """
 
 
-__all__ = ['event']
+from __future__ import unicode_literals
 
 from functools import wraps
 
@@ -33,6 +33,8 @@ from celery import current_task
 from django.contrib.auth import get_user_model
 
 from django_event.publisher.exceptions import EventError
+
+__all__ = ['event']
 
 
 class event(object):

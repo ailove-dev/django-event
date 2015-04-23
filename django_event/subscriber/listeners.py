@@ -5,6 +5,8 @@ Base listener module.
 """
 
 
+from __future__ import unicode_literals
+
 import json
 
 from django_event import settings

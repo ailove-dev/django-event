@@ -6,6 +6,8 @@ You basically don't need to use this module.
 """
 
 
+from __future__ import unicode_literals
+
 from pika import ConnectionParameters
 from pika import PlainCredentials
 from pika.adapters import TornadoConnection

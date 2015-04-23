@@ -6,6 +6,8 @@ Provides basic websocket connection and subscribe/unsubscribe message system.
 """
 
 
+from __future__ import unicode_literals
+
 import json
 from multiprocessing import cpu_count
 

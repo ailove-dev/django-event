@@ -6,15 +6,17 @@ Core event model module.
 You must handle old events by yourself using cron or celery worker.
 """
 
+from __future__ import unicode_literals
 
-from datetime import timedelta
 import threading
+from datetime import timedelta
 
 import celery
 from django.conf import settings as app_settings
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
+from django.utils.encoding import python_2_unicode_compatible
 
 from django_event import settings
 from django_event.utils import get_routing
@@ -109,6 +111,7 @@ class EventQuerySet(models.QuerySet):
         self.completed().not_viewed().update(viewed=True)
 
 
+@python_2_unicode_compatible
 class Event(models.Model):
     """
     Core event class.
@@ -120,8 +123,8 @@ class Event(models.Model):
     """
 
     class Meta:
-        verbose_name = u'Event'
-        verbose_name_plural = u'Events'
+        verbose_name = 'Event'
+        verbose_name_plural = 'Events'
 
     objects = EventQuerySet.as_manager()
 
@@ -165,8 +168,8 @@ class Event(models.Model):
         self._routing_key = None
         self._lock = threading.Lock()
 
-    def __unicode__(self):
-        return u"Event %s %s" % (self.id, self.type)
+    def __str__(self):
+        return "Event %s %s" % (self.id, self.type)
 
     @classmethod
     def create(cls,

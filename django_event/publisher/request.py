@@ -14,6 +14,8 @@ But django request is must for event. ::
 """
 
 
+from __future__ import unicode_literals
+
 import json
 
 
