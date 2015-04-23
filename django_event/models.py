@@ -407,12 +407,7 @@ class Event(models.Model):
         :type custom_message: JSON serializable object.
         """
 
-        if custom_message:
-            self._publisher.publish_message(
-                custom_message
-            )
-            return
-        self._publisher.publish_message({
+        self.try_custom(custom_message) or self._publisher.publish_message({
             'message': {
                 self.id: {
                     'type': self.type,
@@ -440,10 +435,9 @@ class Event(models.Model):
         :type errback: callable object
         """
 
-        if self.status:
-            self.on_success(custom_message, callback)
-        else:
+        if not self.status:
             self.on_error(custom_message, errback)
+        self.on_success(custom_message, callback)
 
     def on_success(self, custom_message, callback):
         """
@@ -456,12 +450,7 @@ class Event(models.Model):
         :type callback: callable object
         """
 
-        if custom_message:
-            self._publisher.publish_message(
-                custom_message
-            )
-            return
-        self._publisher.publish_message({
+        self.try_custom(custom_message) or self._publisher.publish_message({
             'message': {
                 self.id: {
                     'type': self.type,
@@ -487,12 +476,7 @@ class Event(models.Model):
         :type errback: callable object
         """
 
-        if custom_message:
-            self._publisher.publish_message(
-                custom_message
-            )
-            return
-        self._publisher.publish_message({
+        self.try_custom(custom_message) or self._publisher.publish_message({
             'message': {
                 self.id: {
                     'type': self.type,
@@ -515,12 +499,7 @@ class Event(models.Model):
         :type custom_message: JSON serializable object.
         """
 
-        if custom_message:
-            self._publisher.publish_message(
-                custom_message
-            )
-            return
-        self._publisher.publish_message({
+        self.try_custom(custom_message) or self._publisher.publish_message({
             'message': {
                 self.id: {
                     'type': self.type,
@@ -542,12 +521,7 @@ class Event(models.Model):
         :type custom_message: JSON serializable object.
         """
 
-        if custom_message:
-            self._publisher.publish_message(
-                custom_message
-            )
-            return
-        self._publisher.publish_message({
+        self.try_custom(custom_message) or self._publisher.publish_message({
             'message': {
                 self.id: {
                     'type': self.type,
@@ -569,12 +543,7 @@ class Event(models.Model):
         :type custom_message: JSON serializable object.
         """
 
-        if custom_message:
-            self._publisher.publish_message(
-                custom_message
-            )
-            return
-        self._publisher.publish_message({
+        self.try_custom(custom_message) or self._publisher.publish_message({
             'message': {
                 self.id: {
                     'type': self.type,
@@ -587,6 +556,20 @@ class Event(models.Model):
             'routing_strategy': self._routing_strategy,
             'routing_key': self._routing_key
         }, routing_key=self.type)
+
+    def try_custom(self, message):
+        """
+        Custom message helper method. Publish message if present and return
+        True, False otherwise.
+
+        :param message: Custom message.
+        :type message: JSON serializable object.
+        """
+
+        if not message:
+            return False
+        self._publisher.publish_message(message)
+        return True
 
     ############################################################################
     # SEND METHODS
