@@ -50,7 +50,7 @@ def get_routing(user, routing_strategy):
     :param routing_strategy: How it can compute routing key.
     :type routing_strategy: :class:`str`
 
-    :return: Routing key for RabbitMQ
+    :return: Routing key for RabbitMQ.
     :rtype: :class:`str`
     """
 
@@ -64,6 +64,19 @@ def get_routing(user, routing_strategy):
 
 
 def try_import_or_runtime_error(module, message):
+    """
+
+    Trying to import module. No-op if imported. Raises :class:`RuntimeError`
+    with given message otherwise.
+
+    :param module: Module name.
+    :type module: :class:`str`
+    :param message: Error message.
+    :type message: :class:`str`
+
+    :raise: :class:`RuntimeError` if module doesn't exist.
+    """
+
     try:
         __import__(module)
     except ImportError:
