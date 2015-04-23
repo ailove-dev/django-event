@@ -69,6 +69,9 @@ class Subscriber(RabbitMQClient):
         :param frame: Frame instance.
         :type frame: Frame
         """
+
+        # TODO: add queue name
+
         self.channel.queue_declare(exclusive=True,
                                    durable=True,
                                    auto_delete=False,
@@ -91,7 +94,7 @@ class Subscriber(RabbitMQClient):
 
     def on_queue_bind(self, frame):
         """
-        Callback on queue binded. Starts consume messages.
+        Callback on queue bound. Starts consume messages.
         on_message callback will be executed internally.
 
         :param frame: Frame instance.
@@ -174,7 +177,7 @@ class Subscriber(RabbitMQClient):
         elif isinstance(listener, Listener):
             self.event_listeners.add(listener)
         else:
-            raise TypeError
+            raise TypeError('Wrong listener type')
 
     def remove_event_listener(self, listener):
         """
@@ -185,22 +188,20 @@ class Subscriber(RabbitMQClient):
          :class:`Listener` instance
 
         :raise: :class:`KeyError` if listener not found.
+        :raise: :class:`TypeError' if listener has wrong type.
         """
 
         if isinstance(listener, Listener):
-            try:
-                self.event_listeners.remove(listener)
-            except KeyError:
-                pass
+            self.event_listeners.remove(listener)
+        elif isinstance(listener, types.ClassType):
+            for listener_in in self.event_listeners:
+                if isinstance(listener_in, listener):
+                    self.event_listeners.remove(listener_in)
+        elif isinstance(listener, str):
+            listener = listener.split('.').pop()
+            for listener_in in self.event_listeners:
+                if listener == listener_in.__class__.__name__:
+                    self.event_listeners.remove(listener_in)
         else:
-            if isinstance(listener, types.ClassType):
-                for listener_in in self.event_listeners:
-                    if isinstance(listener_in, listener):
-                        self.event_listeners.remove(listener_in)
-            elif isinstance(listener, str):
-                listener = listener.split('.').pop()
-                for listener_in in self.event_listeners:
-                    if listener == listener_in.__class__.__name__:
-                        self.event_listeners.remove(listener_in)
-
+            raise TypeError('Wrong listener type')
 
