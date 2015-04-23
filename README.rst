@@ -25,9 +25,9 @@ After that you need to install ailove-django-event:
     pip install git+https://github.com/ailove-dev/django-event
     
 If you use Django Rest Framework and want to django-event provided REST api's for events ensure you installed
-Django Rest Framework 2.3.14 or greater.
+Django Rest Framework 3.1.1 or newer.
 
-    pip install djangorestframework>=2.3.14
+    pip install djangorestframework>=3.1.1
     
 
 Documentation
