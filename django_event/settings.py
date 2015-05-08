@@ -13,31 +13,24 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 
-################################################################################
-# REQUIRED SETTINGS
-################################################################################
 
-RABBITMQ_HOST = settings.EVENT_RABBITMQ_HOST
+event_settings = settings.DJANGO_EVENT
 
-RABBITMQ_PORT = settings.EVENT_RABBITMQ_PORT
 
-RABBITMQ_VIRTUALHOST = settings.EVENT_RABBITMQ_VIRTUALHOST
+BACKEND = event_settings.get('BACKEND', 'rabbitmq')
 
-RABBITMQ_USERNAME = settings.EVENT_RABBITMQ_USERNAME
+BACKEND_HOST = event_settings.get('BACKEND_HOST', 'localhost')
+BACKEND_PORT = event_settings.get('BACKEND_PORT')
+BACKEND_VIRTUALHOST = event_settings.get('BACKEND_VIRTUALHOST', '')
+BACKEND_USERNAME = event_settings.get('BACKEND_USERNAME', '')
+BACKEND_PASSWORD = event_settings.get('BACKEND_PASSWORD', '')
+BACKEND_QUEUENAME = event_settings.get('BACKEND_QUEUENAME', 'default')
+BACKEND_CACHE = event_settings.get('BACKEND_CACHE')
 
-RABBITMQ_PASSWORD = settings.EVENT_RABBITMQ_PASSWORD
 
-LISTENER_CLASSES = settings.EVENT_LISTENER_CLASSES
+TORNADO_HOST = event_settings.get('TORNADO_HOST', '/')
+TORNADO_PORT = event_settings.get('TORNADO_PORT', 8989)
 
-################################################################################
-# OPTIONAL SETTINGS
-################################################################################
+LISTENER_CLASSES = event_settings.get('EVENT_LISTENER_CLASSES', {})
 
-# HOST WHERE TORNADO SHOULD RUN SERVER
-HOST = getattr(settings, 'EVENT_HOST', '/')
-
-# TORNADO PORT
-PORT = getattr(settings, 'EVENT_PORT', 8989)
-
-# HOW LONG STORE EVENTS
-STORE_DAY = getattr(settings, 'EVENT_STORE_DAY', 7)
+EVENT_STORE_DAYS = event_settings.get('EVENT_STORE_DAYS', 7)

@@ -17,8 +17,8 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        host = settings.HOST
-        port = settings.PORT
+        host = settings.TORNADO_HOST
+        port = settings.TORNADO_PORT
 
         router = SockJSRouter(EventConnection, host)
         app = Application(router.urls)

@@ -21,7 +21,7 @@ from sockjs.tornado.conn import SockJSConnection
 from tornado import gen
 from tornado.concurrent import run_on_executor
 
-from django_event.subscriber.subscriber import Subscriber
+from django_event.backends import Backend
 from django_event.subscriber.listeners import Listener
 
 
@@ -157,7 +157,9 @@ class EventConnection(SockJSConnection):
         subscribe_list = message.get('args', [])
         for subject in subscribe_list:
             if not subject in self.subscribers:
-                self.subscribers[subject] = Subscriber(routing_key=subject)
+                self.subscribers[subject] = Backend.subscriber(
+                    routing_key=subject
+                )
 
                 self.subscribers[subject].add_event_listener(
                     Listener.get_listener(subject),

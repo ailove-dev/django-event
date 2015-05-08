@@ -20,7 +20,7 @@ from django.utils.encoding import python_2_unicode_compatible
 
 from django_event import settings
 from django_event.utils import get_routing
-from django_event.publisher.publisher import BlockingPublisher
+from django_event.backends import Backend
 from django_event.publisher.request import EventRequest
 
 
@@ -58,7 +58,7 @@ class EventQuerySet(models.QuerySet):
         :rtype: :class:`EventQuerySet`
         """
 
-        storing_days = settings.STORE_DAY
+        storing_days = settings.EVENT_STORE_DAYS
         return self.filter(
             completed_at__lte=timezone.now() - timedelta(days=storing_days)
         )
@@ -160,7 +160,7 @@ class Event(models.Model):
 
         super(Event, self).__init__(*args, **kwargs)
 
-        self._publisher = BlockingPublisher()
+        self._publisher = Backend.blocking_publisher()
         self._progress = 0.0
         self._retried_id = None
         self._progress_throttling = None

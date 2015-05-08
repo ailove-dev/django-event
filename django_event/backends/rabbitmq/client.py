@@ -13,19 +13,20 @@ from pika import PlainCredentials
 from pika.adapters import TornadoConnection
 
 from django_event import settings
+from django_event.backends.base.client import BaseClient
 
 
-class RabbitMQClient(object):
+class RabbitMQClient(BaseClient):
     """
     Base RabbitMQ asynchronous adapter.
     """
 
     def __init__(self,
-                 host=settings.RABBITMQ_HOST,
-                 port=settings.RABBITMQ_PORT,
-                 virtual_host=settings.RABBITMQ_VIRTUALHOST,
-                 username=settings.RABBITMQ_USERNAME,
-                 password=settings.RABBITMQ_PASSWORD,
+                 host=settings.BACKEND_HOST,
+                 port=settings.BACKEND_PORT,
+                 virtual_host=settings.BACKEND_VIRTUALHOST,
+                 username=settings.BACKEND_USERNAME,
+                 password=settings.BACKEND_PASSWORD,
                  exchange_name='direct',
                  exchange_type='direct'):
         """

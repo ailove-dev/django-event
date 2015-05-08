@@ -15,11 +15,11 @@ from pika import BasicProperties
 from pika import ConnectionParameters
 from pika import PlainCredentials
 from pika.adapters import BlockingConnection
+from django_event.backends.base.publisher import BasePublisher
+from django_event.backends.rabbitmq.client import RabbitMQClient
 
-from django_event.rabbitmq.client import RabbitMQClient
 
-
-class Publisher(RabbitMQClient):
+class Publisher(RabbitMQClient, BasePublisher):
     """
     Base publisher class. Asynchronous by default.
     """
