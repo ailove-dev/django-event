@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-RabbitMQ subscribes module.
+RabbitMQ subscribers module.
 Contains asynchronous publisher for tornado.
 """
 
@@ -30,9 +30,9 @@ class Subscriber(RabbitMQClient, BaseSubscriber):
         :param queue_name: RabbitMQ queue name, see RabbitMQ docs for more info.
         :type queue_name: :class:`str`
 
-        :param routing_key: RabbitMQ routing key, see RabbitMQ docs for more
+        :param channel: RabbitMQ routing key, see RabbitMQ docs for more
          info.
-        :type routing_key: :class:`str`
+        :type channel: :class:`str`
 
         :param args: RabbitMQ client init args.
 

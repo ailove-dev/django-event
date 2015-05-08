@@ -22,7 +22,7 @@ from django_event.backends.rabbitmq.client import RabbitMQClient
 
 class Publisher(RabbitMQClient, BasePublisher):
     """
-    Base publisher class. Asynchronous by default.
+    Publisher class. Asynchronous by default.
     """
 
     def publish_message(self, message, channel='', *args, **kwargs):

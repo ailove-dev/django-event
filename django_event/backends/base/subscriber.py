@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-    Backend base publisher module.
+Backend base publisher module.
 """
 
 from __future__ import unicode_literals
@@ -15,6 +15,10 @@ from django_event.subscriber.listeners import Listener
 class BaseSubscriber(object):
 
     def __init__(self):
+        """
+        Initialize subscriber.
+        """
+
         self.event_listeners = set([])
 
     @staticmethod

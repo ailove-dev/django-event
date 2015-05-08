@@ -49,6 +49,7 @@ DJANGO_EVENT = {
         'PASSWORD': '',
         'QUEUE_NAME': 'default',
     },
+
     'TORNADO_OPTIONS': {
         'HOST': '/',
         'PORT': 8989

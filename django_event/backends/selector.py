@@ -43,9 +43,7 @@ class BackendSelector(object):
         third is :class:`Subscriber`
 
         :return: :class:`Publisher`, :class:`BlockingPublisher`,
-         :class:`Subscriber`
-        :rtype: :class:`Publisher`, :class:`BlockingPublisher`,
-         :class:`Subscriber`
+         :class:`Subscriber` classes
 
         :raise ImproperlyConfigured:
         """
@@ -70,7 +68,6 @@ class BackendSelector(object):
         Property to publisher class.
 
         :return: Publisher class.
-        :rtype: :class:`Publisher`
         """
 
         return self.backends[0]
@@ -82,7 +79,6 @@ class BackendSelector(object):
         Property to blocking publisher class.
 
         :return: BlockingPublisher class.
-        :rtype: :class:`BlockingPublisher`
         """
 
         return self.backends[1]
@@ -94,7 +90,6 @@ class BackendSelector(object):
         Property to subscriber class.
 
         :return: Subscriber class.
-        :rtype: :class:`Subscriber`
         """
 
         return self.backends[2]

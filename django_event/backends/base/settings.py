@@ -11,5 +11,5 @@ from django_event import settings
 
 
 HOST = settings.BACKEND_OPTIONS.get('HOST', 'localhost')
-PORT = settings.BACKEND_OPTIONS.get('PORT', 5672)
+PORT = settings.BACKEND_OPTIONS.get('PORT')
 PASSWORD = settings.BACKEND_OPTIONS.get('PASSWORD', '')
