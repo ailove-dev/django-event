@@ -9,8 +9,8 @@ Contains asynchronous publisher for tornado.
 from __future__ import unicode_literals
 
 
-from django_event import settings
 from django_event.backends.base.subscriber import BaseSubscriber
+from django_event.backends.rabbitmq import settings
 from django_event.backends.rabbitmq.client import RabbitMQClient
 
 
@@ -20,8 +20,8 @@ class Subscriber(RabbitMQClient, BaseSubscriber):
     """
 
     def __init__(self,
-                 queue_name=settings.BACKEND_QUEUENAME,
-                 routing_key='',
+                 queue_name=settings.QUEUE_NAME,
+                 channel='',
                  *args, **kwargs):
         """
         Initialize RabbitMQ client with passed configuration or get parameters
@@ -42,7 +42,7 @@ class Subscriber(RabbitMQClient, BaseSubscriber):
         super(Subscriber, self).__init__(*args, **kwargs)
 
         self.queue_name = queue_name
-        self.routing_key = routing_key
+        self.routing_key = channel
 
     ############################################################################
     # CALLBACKS

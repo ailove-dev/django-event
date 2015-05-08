@@ -7,7 +7,7 @@ from sockjs.tornado import SockJSRouter
 from tornado.web import Application
 from tornado.ioloop import IOLoop
 
-from django_event import settings
+from django_event.management.commands import settings
 from django_event.subscriber.connection import EventConnection
 
 
@@ -17,12 +17,9 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        host = settings.TORNADO_HOST
-        port = settings.TORNADO_PORT
-
-        router = SockJSRouter(EventConnection, host)
+        router = SockJSRouter(EventConnection, settings.HOST)
         app = Application(router.urls)
-        app.listen(port)
+        app.listen(settings.PORT)
 
         try:
             IOLoop.instance().start()

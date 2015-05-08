@@ -44,7 +44,7 @@ class Listener(object):
         :rtype: :class:`Listener` subclass
         """
 
-        return import_var(settings.LISTENER_CLASSES[event_type])
+        return import_var(settings.LISTENERS[event_type])
 
     def on_message(self, message):
         """

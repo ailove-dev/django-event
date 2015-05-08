@@ -58,7 +58,7 @@ class EventQuerySet(models.QuerySet):
         :rtype: :class:`EventQuerySet`
         """
 
-        storing_days = settings.EVENT_STORE_DAYS
+        storing_days = settings.STORE_DAYS
         return self.filter(
             completed_at__lte=timezone.now() - timedelta(days=storing_days)
         )

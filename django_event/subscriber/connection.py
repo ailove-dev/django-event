@@ -158,7 +158,7 @@ class EventConnection(SockJSConnection):
         for subject in subscribe_list:
             if not subject in self.subscribers:
                 self.subscribers[subject] = Backend.subscriber(
-                    routing_key=subject
+                    channel=subject
                 )
 
                 self.subscribers[subject].add_event_listener(

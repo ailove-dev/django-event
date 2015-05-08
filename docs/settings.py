@@ -41,16 +41,23 @@ INSTALLED_APPS = (
 
 DJANGO_EVENT = {
     'BACKEND': 'rabbitmq',
-    'BACKEND_HOST': '',
-    'BACKEND_PORT': 5672,
-    'BACKEND_VIRTUALHOST': '',
-    'BACKEND_QUEUENAME': '',
-    'BACKEND_USERNAME': '',
-    'BACKEND_PASSWORD': '',
-    'LISTENER_CLASSES': {},
-    'EVENT_STORE_DAYS': 7,
-    'TORNADO_HOST': '/',
-    'TORNADO_PORT': 8989
+    'BACKEND_OPTIONS': {
+        'HOST': 'localhost',
+        'PORT': 5672,
+        'VIRTUAL_HOST': '',
+        'USERNAME': '',
+        'PASSWORD': '',
+        'QUEUE_NAME': 'default',
+    },
+    'TORNADO_OPTIONS': {
+        'HOST': '/',
+        'PORT': 8989
+    },
+    'LISTENERS': {
+        'example_event_type':
+        'django_event.subscriber.listeners.SendMessageListener',
+    },
+    'STORE_DAYS': 7,
 }
 
 MIDDLEWARE_CLASSES = (
