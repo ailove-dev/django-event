@@ -9,5 +9,5 @@ from __future__ import unicode_literals
 
 class BasePublisher(object):
 
-    def publish_message(self, *args, **kwargs):
+    def publish_message(self, message, channel=None, *args, **kwargs):
         raise NotImplementedError

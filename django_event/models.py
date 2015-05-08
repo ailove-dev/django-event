@@ -422,7 +422,7 @@ class Event(models.Model):
             },
             'routing_strategy': self._routing_strategy,
             'routing_key': self._routing_key
-        }, routing_key=self.type)
+        }, channel=self.type)
 
     def on_complete(self, custom_message, callback, errback):
         """
@@ -465,7 +465,7 @@ class Event(models.Model):
             },
             'routing_strategy': self._routing_strategy,
             'routing_key': self._routing_key
-        }, routing_key=self.type)
+        }, channel=self.type)
         callback(self)
 
     def on_error(self, custom_message, errback):
@@ -491,7 +491,7 @@ class Event(models.Model):
             },
             'routing_strategy': self._routing_strategy,
             'routing_key': self._routing_key
-        }, routing_key=self.type)
+        }, channel=self.type)
         errback(self)
 
     def on_progress_change(self, custom_message):
@@ -514,7 +514,7 @@ class Event(models.Model):
             },
             'routing_strategy': self._routing_strategy,
             'routing_key': self._routing_key
-        }, routing_key=self.type)
+        }, channel=self.type)
 
     def on_cancel(self, custom_message):
         """
@@ -536,7 +536,7 @@ class Event(models.Model):
             },
             'routing_strategy': self._routing_strategy,
             'routing_key': self._routing_key
-        }, routing_key=self.type)
+        }, channel=self.type)
 
     def on_retry(self, custom_message):
         """
@@ -558,7 +558,7 @@ class Event(models.Model):
             },
             'routing_strategy': self._routing_strategy,
             'routing_key': self._routing_key
-        }, routing_key=self.type)
+        }, channel=self.type)
 
     def try_custom(self, message):
         """
@@ -601,8 +601,8 @@ class Event(models.Model):
 
         self._publisher.publish_message(
             message,
-            content_type=content_type,
-            routing_key='' if broadcast else str(self.user.id)
+            channel='' if broadcast else str(self.user.id),
+            content_type=content_type
         )
         callback(self)
 

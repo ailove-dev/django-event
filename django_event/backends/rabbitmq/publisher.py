@@ -15,6 +15,7 @@ from pika import BasicProperties
 from pika import ConnectionParameters
 from pika import PlainCredentials
 from pika.adapters import BlockingConnection
+
 from django_event.backends.base.publisher import BasePublisher
 from django_event.backends.rabbitmq.client import RabbitMQClient
 
@@ -24,30 +25,31 @@ class Publisher(RabbitMQClient, BasePublisher):
     Base publisher class. Asynchronous by default.
     """
 
-    def publish_message(self, message, content_type='application/json',
-                        routing_key=''):
+    def publish_message(self, message, channel='', *args, **kwargs):
         """
         Sends given message with specified content type and routing key.
 
         :param message: Message.
         :type message: serializable object
 
-        :param content_type: Message content type.
-        :type content_type: :class:`str`
+        :param channel: Routing key, see RabbitMQ docs for more info.
+        :type channel: :class:`str`
 
-        :param routing_key: Routing key, see RabbitMQ docs for more info.
-        :type routing_key: :class:`str`
+        :param content_type: Message content type. Unusable for this backend.
+        :type content_type: :class:`str`
         """
 
         if not self.channel:
             return
+
+        content_type = kwargs.pop('content_type', 'application/json')
 
         message_json = json.dumps(message)
 
         properties = BasicProperties(content_type=content_type,
                                      delivery_mode=2)
         self.channel.basic_publish(exchange=self.exchange_name,
-                                   routing_key=routing_key,
+                                   routing_key=channel,
                                    body=message_json,
                                    properties=properties)
 
