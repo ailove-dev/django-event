@@ -20,7 +20,7 @@ from django_event.backends.base.publisher import BasePublisher
 from django_event.backends.rabbitmq.client import RabbitMQClient
 
 
-class Publisher(RabbitMQClient, BasePublisher):
+class Publisher(BasePublisher, RabbitMQClient):
     """
     Publisher class. Asynchronous by default.
     """

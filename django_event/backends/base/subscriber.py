@@ -14,12 +14,14 @@ from django_event.subscriber.listeners import Listener
 
 class BaseSubscriber(object):
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Initialize subscriber.
         """
 
-        self.event_listeners = set([])
+        super(BaseSubscriber, self).__init__(*args, **kwargs)
+
+        self.event_listeners = set()
 
     @staticmethod
     def _import_listener(listener):

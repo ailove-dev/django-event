@@ -14,7 +14,7 @@ from django_event.backends.rabbitmq import settings
 from django_event.backends.rabbitmq.client import RabbitMQClient
 
 
-class Subscriber(RabbitMQClient, BaseSubscriber):
+class Subscriber(BaseSubscriber, RabbitMQClient):
     """
     Base subscriber class. Asynchronous by default.
     """
