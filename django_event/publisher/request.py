@@ -51,7 +51,7 @@ class _DummyRequest:
         :type user: :class:`User` or :class:`_DummyUser`
         """
 
-        self.DATA = data
+        self.data = data
         self.user = user
 
 
@@ -70,7 +70,7 @@ class EventRequest(object):
         :param kwargs: Custom arguments needed by task.
         """
 
-        self.data = getattr(django_request, 'DATA', None)
+        self.data = getattr(django_request, 'data', None)
         self.data = self.data or getattr(django_request, 'POST')
         self.user_id = django_request.user.id
         self.data._mutable = True
