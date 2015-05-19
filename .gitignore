@@ -1,3 +1,4 @@
-python/
+python
 .idea
+django_event_example
 *.pyc

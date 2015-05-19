@@ -12,6 +12,8 @@ import threading
 from datetime import timedelta
 
 import celery
+from django.apps.registry import apps
+from django.conf import ImproperlyConfigured
 from django.conf import settings as app_settings
 from django.contrib.auth.models import User
 from django.db import models
@@ -112,10 +114,9 @@ class EventQuerySet(models.QuerySet):
 
 
 @python_2_unicode_compatible
-class Event(models.Model):
+class AbstractBaseEvent(models.Model):
     """
-    Core event class.
-    Don't inherit this model.
+    An abstract base class implementing a fully featured Event model.
     Majority of model methods have custom_message parameter in case if you
     don't like/need default message protocol.
     Most of the methods are for private need i.e. all on_* methods. Be sure
@@ -125,6 +126,7 @@ class Event(models.Model):
     class Meta:
         verbose_name = 'Event'
         verbose_name_plural = 'Events'
+        abstract = True
 
     objects = EventQuerySet.as_manager()
 
@@ -158,7 +160,7 @@ class Event(models.Model):
         :param kwargs: Model kwargs.
         """
 
-        super(Event, self).__init__(*args, **kwargs)
+        super(AbstractBaseEvent, self).__init__(*args, **kwargs)
 
         self._publisher = Backend.blocking_publisher()
         self._progress = 0.0
@@ -169,7 +171,7 @@ class Event(models.Model):
         self._lock = threading.Lock()
 
     def __str__(self):
-        return "Event %s %s" % (self.id, self.type)
+        return "Event | %s | %s" % (self.id, self.type)
 
     @classmethod
     def create(cls,
@@ -379,7 +381,7 @@ class Event(models.Model):
         self.save()
         self.on_retry(custom_message)
 
-        self._retried_id = Event.objects.get(task_id=new_task_id).id
+        self._retried_id = self.__class__.objects.get(task_id=new_task_id).id
         return self._retried_id
 
     def cancel(self, custom_message=None):
@@ -615,3 +617,30 @@ class Event(models.Model):
 
         # TODO: Implement email sending
         pass
+
+
+class Event(AbstractBaseEvent):
+    """
+    Default event model.
+    """
+
+    class Meta:
+        abstract = (
+            False if settings.EVENT_MODEL == 'django_event.Event' else True
+        )
+
+
+def get_event_model():
+    """
+    Helper for getting event swappable model.
+
+    :return: :class:`Event` model
+    """
+
+    model_path = settings.EVENT_MODEL
+    swappable = apps.get_model(model_path)
+    if not issubclass(swappable, AbstractBaseEvent):
+        raise ImproperlyConfigured(
+            "Given %s model isn't subclass of AbstractBaseUser" % model_path
+        )
+    return swappable

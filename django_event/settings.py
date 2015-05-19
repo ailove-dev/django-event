@@ -25,3 +25,7 @@ TORNADO_OPTIONS = event_settings.get('TORNADO_OPTIONS', {})
 LISTENERS = event_settings.get('LISTENERS', {})
 
 STORE_DAYS = event_settings.get('STORE_DAYS', 7)
+
+EVENT_MODEL = event_settings.get('EVENT_MODEL', 'django_event.Event')
+
+AVAILABLE_TYPES = [key for key in LISTENERS.iterkeys()]

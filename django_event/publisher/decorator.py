@@ -34,8 +34,6 @@ from django.contrib.auth import get_user_model
 
 from django_event.publisher.exceptions import EventError
 
-__all__ = ['event']
-
 
 class event(object):
 
@@ -124,9 +122,11 @@ class event(object):
         Basically you dont need to manually create event.
         """
 
-        from django_event.models import Event
+        from django_event.models import get_event_model
 
-        self._event = Event.create(
+        event_model = get_event_model()
+
+        self._event = event_model.create(
             progress_throttling=self._progress_throttling,
             routing_strategy=self._routing_strategy,
             user=self._user,

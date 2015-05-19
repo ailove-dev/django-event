@@ -70,9 +70,12 @@ class EventRequest(object):
         :param kwargs: Custom arguments needed by task.
         """
 
-        self.data = django_request.DATA
+        self.data = getattr(django_request, 'DATA', None)
+        self.data = self.data or getattr(django_request, 'POST')
         self.user_id = django_request.user.id
+        self.data._mutable = True
         self.send_mail = self.data.pop('send_mail', True)
+        self.data._mutable = False
         self.custom_args = kwargs
 
     def __getattr__(self, item):
@@ -116,12 +119,12 @@ class EventRequest(object):
         :rtype: :class:`EventRequest` or :class:`dict`
         """
 
-        dicted_request = json.loads(json_request)
+        dict_request = json.loads(json_request)
 
-        user = _DummyUser(dicted_request['user_id'])
-        request = _DummyRequest(dicted_request['data'], user)
+        user = _DummyUser(dict_request['user_id'])
+        request = _DummyRequest(dict_request['data'], user)
 
         if return_dummy:
-            return request, dicted_request['custom_args']
+            return request, dict_request['custom_args']
 
-        return EventRequest(request, **dicted_request['custom_args'])
+        return EventRequest(request, **dict_request['custom_args'])
