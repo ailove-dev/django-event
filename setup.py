@@ -27,6 +27,7 @@ if sys.version < '3':
 extras = {
     'rest_framework': ['djangorestframework>=3.1.1', ],
     'rabbit_mq': ['pika>=0.9.14', ],
+    'redis': ['django-redis==3.8.3', ],
 }
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'

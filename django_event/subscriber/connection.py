@@ -146,6 +146,7 @@ class EventConnection(SockJSConnection):
 
         actions.get(message_type, self.wrong_message)(message)
 
+    @gen.coroutine
     def subscribe(self, message):
         """
         Subscribes event listeners on messages.
@@ -156,11 +157,8 @@ class EventConnection(SockJSConnection):
 
         subscribe_list = message.get('args', [])
         for subject in subscribe_list:
-            if not subject in self.subscribers:
-                self.subscribers[subject] = Backend.subscriber(
-                    channel=subject
-                )
-
+            if subject not in self.subscribers:
+                self.subscribers[subject] = Backend.subscriber(channel=subject)
                 self.subscribers[subject].add_event_listener(
                     Listener.get_listener(subject),
                     self.user,
@@ -168,6 +166,7 @@ class EventConnection(SockJSConnection):
                 )
                 self.subscribers[subject].connect()
 
+    @gen.coroutine
     def wrong_message(self, message):
         """
         Overridable method for wrong message type.
@@ -178,6 +177,7 @@ class EventConnection(SockJSConnection):
 
         pass
 
+    @gen.coroutine
     def unsubscribe(self, message):
         """
         Unsubscribes event listeners from messages.
@@ -217,5 +217,5 @@ class EventConnection(SockJSConnection):
         Unsubscribes all event listeners.
         """
 
-        for _, subscriber in self.subscribers.iteritems():
+        for subscriber in self.subscribers.itervalues():
             subscriber.disconnect()

@@ -53,11 +53,15 @@ class BackendSelector(object):
                 'Invalid backend setting. Available backends are %s' %
                 str(self.AVAILABLE_BACKENDS)
             )
-        publisher = import_var('%s.publisher.Publisher' % BACKEND)
-        blocking_publisher = import_var(
-            '%s.publisher.BlockingPublisher' % BACKEND
+        publisher = import_var(
+            'django_event.backends.%s.publisher.Publisher' % BACKEND
         )
-        subscriber = import_var('%s.subscriber.Subscriber' % BACKEND)
+        blocking_publisher = import_var(
+            'django_event.backends.%s.publisher.BlockingPublisher' % BACKEND
+        )
+        subscriber = import_var(
+            'django_event.backends.%s.subscriber.Subscriber' % BACKEND
+        )
 
         return publisher, blocking_publisher, subscriber
 

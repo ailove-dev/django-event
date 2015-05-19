@@ -36,7 +36,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'event',
+    'django_event',
 )
 
 DJANGO_EVENT = {
@@ -49,6 +49,18 @@ DJANGO_EVENT = {
         'PASSWORD': '',
         'QUEUE_NAME': 'default',
     },
+
+    # 'BACKEND': 'redis',
+    # 'BACKEND_OPTIONS': {
+    #     'HOST': 'localhost',
+    #     'PORT': 6379,
+    #     'PASSWORD': '',
+    #     'DB': 0,
+    #     'USE_REDIS_CACHE': False,
+    #     'SOCKET_TIMEOUT': 5,
+    #     'SOCKET_CONNECT_TIMEOUT': 5,
+    #     'UNIX_SOCKET_PATH': None
+    # },
 
     'TORNADO_OPTIONS': {
         'HOST': '/',
