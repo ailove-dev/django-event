@@ -1,4 +1,5 @@
 python
 .idea
-django_event_example
 *.pyc
+*.sqlite3
+*.out

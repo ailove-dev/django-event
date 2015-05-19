@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <script src="//cdn.jsdelivr.net/sockjs/0.3.4/sockjs.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+    <meta charset="UTF-8">
+    <title>Example</title>
+</head>
+<body>
+    <span id="status" style="color: red">Closed</span>
+    <button id="connect">Connect</button>
+    <button id="disconnect" disabled>Disconnect</button>
+    <br><br>
+    <select id="input_sub"></select>
+    <button id="subscribe" disabled>Subscribe</button>
+    <br><br>
+    <select id="input_unsub"></select>
+    <button id="unsubscribe" disabled>Unsubscribe</button>
+    <br><br>
+    <button id="add_event">Add event</button>
+    <br><br>
+    <div id="list"></div>
+    <script>
+
+        $(document).ready(function() {
+            var event_types;
+            $.ajax({
+                url: "/types/"
+            }).done(function(response) {
+                event_types = response.types;
+                event_types.forEach(function (item) {
+                    $('#input_sub').append($(
+                        '<option id="' + item +
+                        '" value="' + item + '">' + item + '</option>'
+                    ))
+                })
+            })
+            .fail(function(response) {
+                alert('Something wrong');
+            });
+
+            $('#connect').click(function(e) {
+                var sock;
+                var status = $('#status');
+                var input_sub = $('#input_sub');
+                var input_unsub = $('#input_unsub');
+                var button_sub = $('#subscribe');
+                var button_unsub = $('#unsubscribe');
+                var button_con = $('#connect');
+                var button_dis = $('#disconnect');
+                var event_list = $('#list');
+
+                var add_callbacks_to_socket = function(socket) {
+                    sock.onopen = function() {
+                        status.css("color", "blue").text("Open");
+                        button_con.attr("disabled", "disabled");
+                        button_sub.removeAttr("disabled");
+                        button_unsub.removeAttr("disabled");
+                        button_dis.removeAttr("disabled");
+                    };
+                    sock.onmessage = function(e) {
+                        var message = JSON.parse(e.data);
+                        var event_id;
+                        for (property in message) {
+                            event_id = property;
+                        }
+
+                        var event_obj = message[event_id];
+
+                        var type = event_obj.type;
+                        var action = event_obj.action;
+                        var status = event_obj.status;
+                        var body = event_obj.body;
+                        var error = event_obj.error;
+
+                        if (action == "started") {
+                            var event_node = $(
+                                    "<div id='event_" + event_id + "'></div>"
+                            );
+
+                            $("<span><b>id:</b></span>").appendTo(event_node);
+                            $("<span>" + event_id + "</span>")
+                                .appendTo(event_node);
+                            event_node.append($('<br>'));
+
+                            $("<span><b>type:</b></span>").appendTo(event_node);
+                            $("<span>" + type + "</span>").appendTo(event_node);
+                            event_node.append($('<br>'));
+
+                            $("<span><b>action:</b></span>")
+                                .appendTo(event_node);
+                            $("<span class='action'>" + action + "</span>")
+                                .appendTo(event_node);
+                            event_node.append($('<br>'));
+
+                            $("<span><b>status:</b></span>")
+                                .appendTo(event_node);
+                            $("<span class='status'>" + status + "</span>")
+                                .appendTo(event_node);
+                            event_node.append($('<br>'));
+
+                            $("<span><b>body:</b></span>").appendTo(event_node);
+                            $("<span class='body'>" + body + "</span>")
+                                .appendTo(event_node);
+                            event_node.append($('<br>'));
+
+
+                            $("<span><b>error:</b></span>")
+                                .appendTo(event_node);
+                            $("<span class='error'>" + error + "</span>")
+                                .appendTo(event_node);
+                            event_node.append($('<br>'));
+                            event_node.append($('<br>'));
+
+                            event_node.appendTo(event_list);
+                        } else if (action == "progress_change") {
+                            $('#event_' + event_id + ' .action').text(action);
+                            $('#event_' + event_id + ' .status').text(status);
+                        } else if (action == "completed") {
+                            $('#event_' + event_id + ' .status').text(status);
+                            $('#event_' + event_id + ' .action').text(action);
+                            $('#event_' + event_id + ' .body').text(body);
+                            $('#event_' + event_id + ' .error').text(error);
+                        }
+
+                    };
+                    sock.onclose = function() {
+                        status.css("color", "red").text("Closed");
+                        button_con.removeAttr("disabled");
+                        button_dis.attr("disabled", "disabled");
+                        button_sub.attr("disabled", "disabled");
+                        button_unsub.attr("disabled", "disabled");
+                    };
+                };
+
+                sock = new SockJS(
+                    location.protocol + '//' + location.hostname + ":8989"
+                );
+                add_callbacks_to_socket(sock);
+
+                button_sub.click(function(event) {
+                    var selected = $('#' + input_sub.val());
+                    console.log(selected, selected.val());
+                    input_unsub.append(selected);
+                    input_sub.remove('#' + selected.val());
+                    setTimeout(function() {
+                        sock.send(JSON.stringify({
+                            "type": "subscribe",
+                            "args": [
+                                selected.val()
+                            ]
+                        }));
+                        status.css("color", "green").text("Subscribed");
+                    }, 25);
+                });
+
+                button_unsub.click(function(event) {
+                    var selected = $('#' + input_unsub.val());
+                    console.log(selected, selected.val());
+                    input_sub.append(selected);
+                    input_unsub.remove('#' + selected.val());
+                    setTimeout(function() {
+                        sock.send(JSON.stringify({
+                            "type": "unsubscribe",
+                            "args": [
+                                selected.val()
+                            ]
+                        }));
+                        if (input_unsub.has('option')) {
+                            status.css("color", "blue").text("Open");
+                        }
+                    }, 25);
+                });
+
+                button_dis.click(function(event) {
+                    sock.close();
+                });
+
+                button_con.off('click');
+                button_con.click(function(event) {
+                    sock = new SockJS(
+                        location.protocol + '//' + location.hostname + ":8989"
+                    );
+                    add_callbacks_to_socket(sock);
+                });
+            });
+
+            $('#add_event').click(function(e) {
+                $.ajax({
+                    url: "/example_start/"
+                })
+                .fail(function(response) {
+                    alert("Something wrong");
+                })
+            });
+        });
+
+    </script>
+</body>
+</html>
