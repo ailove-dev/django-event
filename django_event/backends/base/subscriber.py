@@ -86,7 +86,7 @@ class BaseSubscriber(object):
 
         if isinstance(listener, Listener):
             self.event_listeners.remove(listener)
-        elif isinstance(listener, types.ClassType):
+        elif issubclass(listener, Listener):
             for listener_in in self.event_listeners:
                 if isinstance(listener_in, listener):
                     self.event_listeners.remove(listener_in)
