@@ -7,6 +7,8 @@ Synchronous views for django to get/cancel or retry events.
 
 from __future__ import unicode_literals
 
+import json
+
 from django.contrib.auth.decorators import login_required
 from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -16,6 +18,7 @@ from django.views.generic.base import View
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 
+from django_event import settings
 from django_event.models import Event
 
 
@@ -92,6 +95,24 @@ class EventDetailView(LoginRequiredMixin,
     """
 
 event_detail = EventDetailView.as_view()
+
+
+class EventTypesView(LoginRequiredMixin,
+                     View):
+    """
+    Event types view.
+    """
+
+    def get(self, request):
+        """
+        Return event types.
+        """
+
+        return HttpResponse(json.dumps({
+            "types": settings.AVAILABLE_TYPES
+        }))
+
+event_types = EventTypesView.as_view()
 
 
 class CancelEventView(LoginRequiredMixin,

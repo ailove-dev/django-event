@@ -36,6 +36,7 @@ from django.conf.urls import patterns, url
 
 from django_event.publisher.rest_framework.views import event_list
 from django_event.publisher.rest_framework.views import event_detail
+from django_event.publisher.rest_framework.views import event_types
 from django_event.publisher.rest_framework.views import cancel_event
 from django_event.publisher.rest_framework.views import retry_event
 
@@ -51,6 +52,11 @@ urlpatterns = patterns(
         r'^(?P<pk>[0-9]+)/$',
         event_detail,
         name='event_detail'
+    ),
+    url(
+        r'^types/$',
+        event_types,
+        name='event_types'
     ),
     url(
         r'^(?P<pk>[0-9]+)/cancel/$',

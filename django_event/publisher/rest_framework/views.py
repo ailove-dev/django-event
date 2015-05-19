@@ -17,6 +17,7 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from django_event import settings
 from django_event.models import Event
 from django_event.publisher.rest_framework.serializers import EventSerializer
 
@@ -78,6 +79,25 @@ class EventDetailView(APIView):
             raise Http404()
 
 event_detail = EventDetailView.as_view()
+
+
+class EventTypesView(APIView):
+    """
+    Event types view.
+    """
+
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request):
+        """
+        Return event types.
+        """
+
+        return Response({
+            "types": settings.AVAILABLE_TYPES
+        })
+
+event_types = EventTypesView.as_view()
 
 
 class CancelEventView(APIView):
