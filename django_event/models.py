@@ -19,6 +19,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.translation import ugettext_lazy as _
 
 from django_event import settings
 from django_event.utils import get_routing
@@ -124,32 +125,36 @@ class AbstractBaseEvent(models.Model):
     """
 
     class Meta:
-        verbose_name = 'Event'
-        verbose_name_plural = 'Events'
+        verbose_name = _('Event')
+        verbose_name_plural = _('Events')
         abstract = True
 
     objects = EventQuerySet.as_manager()
 
-    user = models.ForeignKey(getattr(app_settings, 'AUTH_USER_MODEL', User))
-    type = models.CharField(max_length=30)
-    send_mail = models.BooleanField(default=False)
+    user = models.ForeignKey(getattr(app_settings, 'AUTH_USER_MODEL', User),
+                             verbose_name=_('user'))
+    type = models.CharField(max_length=30, verbose_name=_('event type'))
+    send_mail = models.BooleanField(default=False, verbose_name=_('send mail'))
 
     task_id = models.CharField(max_length=256, null=True)
     task_name = models.CharField(max_length=256, editable=False)
     event_request = models.TextField(null=True)
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    started_at = models.DateTimeField(null=True)
-    completed_at = models.DateTimeField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True,
+                                      verbose_name=_('created at'))
+    started_at = models.DateTimeField(null=True,
+                                      verbose_name=_('started at'))
+    completed_at = models.DateTimeField(null=True,
+                                        verbose_name=_('completed at'))
 
-    started = models.BooleanField(default=False)
-    completed = models.BooleanField(default=False)
-    canceled = models.BooleanField(default=False)
-    retried = models.BooleanField(default=False)
-    viewed = models.BooleanField(default=False)
+    started = models.BooleanField(default=False, verbose_name=_('started'))
+    completed = models.BooleanField(default=False, verbose_name=_('completed'))
+    canceled = models.BooleanField(default=False, verbose_name=_('canceled'))
+    retried = models.BooleanField(default=False, verbose_name=_('retried'))
+    viewed = models.BooleanField(default=False, verbose_name=_('viewed'))
 
-    status = models.BooleanField(default=True)
-    result = models.TextField(null=True)
+    status = models.BooleanField(default=True, verbose_name=_('status'))
+    result = models.TextField(null=True, verbose_name=_('result'))
 
     def __init__(self, *args, **kwargs):
         """
@@ -171,7 +176,10 @@ class AbstractBaseEvent(models.Model):
         self._lock = threading.Lock()
 
     def __str__(self):
-        return "Event | %s | %s" % (self.id, self.type)
+        return _("Event | %(id)s | %(type)s") % {
+            'id': self.id,
+            'type': self.type
+        }
 
     @classmethod
     def create(cls,
