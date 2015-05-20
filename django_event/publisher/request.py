@@ -55,6 +55,29 @@ class _DummyRequest:
         self.user = user
 
 
+class mutable(object):
+    """
+    Context manager for modifying django request.
+    """
+
+    def __init__(self, ctx):
+        self.ctx = ctx
+        self.ctx_maybe_mutable = getattr(self.ctx, '_mutable', None)
+        if self.ctx_maybe_mutable is None:
+            self.ctx_immutable = False
+        else:
+            self.ctx_immutable = not self.ctx_maybe_mutable
+
+    def __enter__(self):
+        if self.ctx_immutable:
+            self.ctx._mutable = not self.ctx_immutable
+        return self.ctx
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.ctx_immutable:
+            self.ctx._mutable = not self.ctx._mutable
+
+
 class EventRequest(object):
     """
     Event request class user to pass arguments to decorated events.
@@ -73,9 +96,8 @@ class EventRequest(object):
         self.data = getattr(django_request, 'data', None)
         self.data = self.data or getattr(django_request, 'POST')
         self.user_id = django_request.user.id
-        self.data._mutable = True
-        self.send_mail = self.data.pop('send_mail', True)
-        self.data._mutable = False
+        with mutable(self.data):
+            self.send_mail = self.data.pop('send_mail', True)
         self.custom_args = kwargs
 
     def __getattr__(self, item):
