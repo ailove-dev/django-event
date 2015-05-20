@@ -25,3 +25,6 @@
     Implement swappable model system.
     Refactor request to support pure HttpRequest.
     Global settings refactor.
+1.0.1 (2015-05-20)
+    Add i18n
+    Fix Django Request modification.
