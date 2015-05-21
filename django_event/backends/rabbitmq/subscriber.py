@@ -69,9 +69,9 @@ class Subscriber(BaseSubscriber, RabbitMQClient):
         :type frame: Frame
         """
 
-        self.channel.queue_declare(exclusive=True,
+        self.channel.queue_declare(exclusive=False,
                                    durable=True,
-                                   auto_delete=False,
+                                   auto_delete=True,
                                    queue=self.queue_name,
                                    callback=self.on_queue_declared)
 
