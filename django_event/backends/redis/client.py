@@ -62,7 +62,7 @@ class RedisClient(BaseClient):
         if not use_redis_cache:
             self.client_kwargs = {
                 'host': host,
-                'port': port,
+                'port': int(port),
                 'password': password,
                 'db': db,
                 'socket_connect_timeout': socket_connect_timeout,

@@ -56,7 +56,7 @@ class RabbitMQClient(BaseClient):
         """
 
         self.host = host
-        self.port = port
+        self.port = int(port)
         self.virtual_host = virtual_host
         self.username = username
         self.password = password
