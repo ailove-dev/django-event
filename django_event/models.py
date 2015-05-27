@@ -8,7 +8,6 @@ You must handle old events by yourself using cron or celery worker.
 
 from __future__ import unicode_literals
 
-import threading
 from datetime import timedelta
 
 import celery
@@ -171,9 +170,9 @@ class AbstractBaseEvent(models.Model):
         self._progress = 0.0
         self._retried_id = None
         self._progress_throttling = None
+        self._delta_acc = 0
         self._routing_strategy = None
         self._routing_key = None
-        self._lock = threading.Lock()
 
     def __str__(self):
         return _("Event | %(id)s | %(type)s") % {
@@ -359,13 +358,22 @@ class AbstractBaseEvent(models.Model):
         :type custom_message: JSON serializable object.
         """
 
-        with self._lock:
-            if self._progress + progress_delta > 100.0:
-                self._progress = 99.9
-            else:
-                self._progress += progress_delta
-            if progress_delta >= self._progress_throttling:
-                self.on_progress_change(custom_message)
+        if self._progress + progress_delta > 100.0:
+            self._progress = 99.9
+        else:
+            self._progress += progress_delta
+
+        # If event action perform hard work progress delta might be so low
+        # to messages never be sent. Here we add simple progress delta
+        # accumulator to fix this issue. Throttling condition will check
+        # accumulated results to our messages be sent and set it back to 0
+        # after message is sent.
+
+        self._delta_acc += progress_delta
+
+        if self._delta_acc >= self._progress_throttling:
+            self._delta_acc = 0
+            self.on_progress_change(custom_message)
 
     def retry(self, custom_message=None, request=None, **kwargs):
         """
