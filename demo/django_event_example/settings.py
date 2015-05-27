@@ -99,7 +99,7 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERY_DEFAULT_QUEUE = 'default'
 
 # BROKER_URL = (
-#     'amqp://purinaproplan:purinaproplan@localhost:5672/purinaproplan-dev'
+#     'amqp://admim:admin@localhost:5672/default'
 # )
 # CELERY_RESULT_BACKEND = 'amqp'
 # CELERY_DEFAULT_QUEUE = 'default'

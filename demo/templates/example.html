@@ -140,7 +140,6 @@
 
                 button_sub.click(function(event) {
                     var selected = $('#' + input_sub.val());
-                    console.log(selected, selected.val());
                     input_unsub.append(selected);
                     input_sub.remove('#' + selected.val());
                     setTimeout(function() {
@@ -156,7 +155,6 @@
 
                 button_unsub.click(function(event) {
                     var selected = $('#' + input_unsub.val());
-                    console.log(selected, selected.val());
                     input_sub.append(selected);
                     input_unsub.remove('#' + selected.val());
                     setTimeout(function() {
