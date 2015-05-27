@@ -9,10 +9,6 @@ Contains asynchronous publisher for tornado.
 from __future__ import unicode_literals
 
 import time
-from multiprocessing import cpu_count
-
-from concurrent.futures import ThreadPoolExecutor
-from tornado.concurrent import run_on_executor
 from tornado.ioloop import IOLoop
 
 from django_event.backends.base.subscriber import BaseSubscriber
@@ -37,9 +33,7 @@ class Subscriber(BaseSubscriber, RedisClient):
         self.channel = channel
         self._consume = True
         self.io_loop = IOLoop.current()
-        self.executor = ThreadPoolExecutor(max_workers=cpu_count())
 
-    @run_on_executor
     def consume(self):
         """
         Consumes messages in separate thread and notifies event listeners.
@@ -49,8 +43,7 @@ class Subscriber(BaseSubscriber, RedisClient):
         if message:
             self.notify_listeners(message['data'])
         if self._consume:
-            self.io_loop.add_callback(self.consume)
-        time.sleep(0.01)
+            self.io_loop.add_timeout(time.time() + 0.01, self.consume)
 
     def connect(self):
         """

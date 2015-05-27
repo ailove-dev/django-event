@@ -6,8 +6,6 @@ Backend base publisher module.
 
 from __future__ import unicode_literals
 
-import types
-
 from django_event.utils import import_var
 from django_event.subscriber.listeners import Listener
 
@@ -62,15 +60,38 @@ class BaseSubscriber(object):
         :raise: :class:`TypeError` if listeners of unknown type passed into.
         """
 
+        # listener is string representation
         if isinstance(listener, str):
             self.event_listeners.add(
-                self._import_listener(listener)(*args, **kwargs))
+                self._import_listener(listener)(*args, **kwargs)
+            )
+
+        # subclass of base listener
         elif issubclass(listener, Listener):
             self.event_listeners.add(listener(*args, **kwargs))
+
+        # listener instance
         elif isinstance(listener, Listener):
             self.event_listeners.add(listener)
+
         else:
             raise TypeError('Wrong listener type')
+
+    def _remove_base_listener_instance(self, listener):
+        for listener_in in self.event_listeners:
+            if listener_in == listener:
+                return self.event_listeners.remove(listener_in)
+
+    def _remove_base_listener_subclass(self, listener):
+        for listener_in in self.event_listeners:
+            if isinstance(listener_in, listener):
+                return self.event_listeners.remove(listener_in)
+
+    def _remove_string_repr_listener(self, listener):
+        listener = listener.split('.').pop()
+        for listener_in in self.event_listeners:
+            if listener == listener_in.__class__.__name__:
+                return self.event_listeners.remove(listener_in)
 
     def remove_event_listener(self, listener):
         """
@@ -85,16 +106,11 @@ class BaseSubscriber(object):
         """
 
         if isinstance(listener, Listener):
-            self.event_listeners.remove(listener)
+            self._remove_base_listener_instance(listener)
         elif issubclass(listener, Listener):
-            for listener_in in self.event_listeners:
-                if isinstance(listener_in, listener):
-                    self.event_listeners.remove(listener_in)
+            self._remove_base_listener_subclass(listener)
         elif isinstance(listener, str):
-            listener = listener.split('.').pop()
-            for listener_in in self.event_listeners:
-                if listener == listener_in.__class__.__name__:
-                    self.event_listeners.remove(listener_in)
+            self._remove_string_repr_listener(listener)
         else:
             raise TypeError('Wrong listener type')
 

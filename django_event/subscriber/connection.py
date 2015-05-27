@@ -159,8 +159,9 @@ class EventConnection(SockJSConnection):
         for subject in subscribe_list:
             if subject not in self.subscribers:
                 self.subscribers[subject] = Backend.subscriber(channel=subject)
+                listener = yield Listener.get_listener(subject)
                 self.subscribers[subject].add_event_listener(
-                    Listener.get_listener(subject),
+                    listener,
                     self.user,
                     self.send
                 )
@@ -190,10 +191,9 @@ class EventConnection(SockJSConnection):
         for subject in subscribe_list:
             if subject in self.subscribers:
                 subscriber = self.subscribers.pop(subject)
-                subscriber.remove_event_listener(
-                    Listener.get_listener(subject)
-                )
                 subscriber.disconnect()
+                listener = yield Listener.get_listener(subject)
+                subscriber.remove_event_listener(listener)
 
     @gen.coroutine
     def send(self, message, binary=False):

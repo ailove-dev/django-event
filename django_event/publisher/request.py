@@ -70,7 +70,7 @@ class mutable(object):
 
     def __enter__(self):
         if self.ctx_immutable:
-            self.ctx._mutable = not self.ctx_immutable
+            self.ctx._mutable = not self.ctx._mutable
         return self.ctx
 
     def __exit__(self, exc_type, exc_val, exc_tb):

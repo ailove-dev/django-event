@@ -8,6 +8,12 @@ Base listener module.
 from __future__ import unicode_literals
 
 import json
+from multiprocessing import cpu_count
+
+from concurrent.futures import ThreadPoolExecutor
+from django.utils.lru_cache import lru_cache
+from tornado.ioloop import IOLoop
+from tornado.concurrent import run_on_executor
 
 from django_event import settings
 from django_event.utils import get_routing
@@ -18,6 +24,9 @@ class Listener(object):
     """
     Abstract base listener class. Listeners used by subscribers.
     """
+
+    executor = ThreadPoolExecutor(max_workers=cpu_count())
+    io_loop = IOLoop.current()
 
     def __init__(self, user):
         """
@@ -31,7 +40,20 @@ class Listener(object):
         self._routing_key = None
         self._message = None
 
+    def __eq__(self, other):
+        if not isinstance(other, Listener):
+            return False
+        return (
+            self._user == other._user and
+            self._routing_key == other._routing_key
+        )
+
+    def __ne__(self, other):
+        return not (self == other)
+
     @classmethod
+    @run_on_executor
+    @lru_cache()
     def get_listener(cls, event_type):
         """
         Fabric method for listener subclasses.
