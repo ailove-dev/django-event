@@ -23,8 +23,15 @@
     Implement swappable backend system.
     Add redis backend.
     Implement swappable model system.
-    Refactor request to support pure HttpRequest.
-    Global settings refactor.
+    Refactored request to support pure HttpRequest.
+    Global settings refactoring.
 1.0.1 (2015-05-20)
     Add i18n
     Fix Django Request modification.
+1.0.2 (2015-05-21)
+    Fixed string port conversion.
+    Fixed rabbitmq exclusive queue.
+1.0.3 (2015-05-27)
+    Fixed redis subscriber memory leak.
+    Refactored base subscriber.
+    Added listener classes caching.
